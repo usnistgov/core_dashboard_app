@@ -1,0 +1,64 @@
+{% load dict_key_extras %}
+
+<table id="table-records-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
+    <thead>
+        {% if user.is_staff %}
+            <th> <input type="checkbox" id="select_all_{{group}}" onchange="selectAll(this, '{{group}}')"> </th>
+        {% endif %}
+        <th>Resource name</th>
+        <th>Last Modification date</th>
+        {% if user.is_staff %}
+            <th>User</th>
+        {% endif %}
+        <th>Actions</th>
+    </thead>
+    <tbody>
+        {% for data_loaded in loaded_data %}
+            {% cycle 'even' '' as rowcolors silent %}
+            <tr class="{{ rowcolors }}" objectid="{{data_loaded.id}}">
+                {% if user.is_staff %}
+                <td id="actionCheckbox">
+                    <input type="checkbox" id={{data_loaded.id}} name={{group}}>
+                </td>
+                {% endif %}
+                <td>
+                    {% if data_loaded.content.Resource.identity.title %}
+                        {{ data_loaded.content.Resource.identity.title }}
+                    {% else %}
+                        <script>
+                            document.write('{{ data_loaded.title }}'.replace(/\.[^/.]+$/, ""));
+                        </script>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ data_loaded.last_modification_date|date:"Y/m/d, g:i A " }}
+                </td>
+                {% if user.is_staff %}
+                <td>
+                    {% with key=data_loaded.user_id %}
+                      {{ data.usernames|get:key }}
+                    {% endwith %}
+                </td>
+                {% endif %}
+                <td>
+                    <a class="btn btn-default view-record-btn">
+                        <i class="fa fa-file-text-o"></i> View
+                    </a>
+
+                    <a class="btn btn-default edit-record-btn">
+                        <i class="fa fa-edit"></i> Edit
+                    </a>
+                    {% if not user.is_staff %}
+                        <a class="btn btn-default delete-result-btn">
+                            <i class="fa fa-trash"></i> Delete
+                        </a>
+
+                        <a class="btn btn-default change-owner-btn">
+                            <i class="fa fa-user-circle-o"></i> Change Owner
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

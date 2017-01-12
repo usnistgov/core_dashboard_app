@@ -2,61 +2,58 @@
     Views available for the user
 """
 
-# from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.http.response import HttpResponseRedirect
-from django.db import IntegrityError
-from django.utils import timezone
-from password_policies.views import PasswordChangeFormView
 import json
 
-from core_dashboard_app import settings
-from core_main_app.utils.rendering import render
-from core_main_app.views.admin.forms import EditProfileForm
+from django.contrib import messages
+from django.core.urlresolvers import reverse
+from django.db import IntegrityError
+from django.http.response import HttpResponseRedirect
+from django.utils import timezone
+from password_policies.views import PasswordChangeFormView
+from django.contrib.auth.decorators import login_required
+
+from core_dashboard_app import constants
+from core_dashboard_app.views.forms import ActionForm, UserForm
+from core_main_app.components.data import api as data_api
 from core_main_app.components.user import api as user_api
 from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
+from core_main_app.utils.rendering import render
+from core_main_app.views.admin.forms import EditProfileForm
 
 
-# FIXME: put it back when we will be able to log in
-# @login_required(login_url='/login')
+@login_required(login_url='/login')
 def home(request):
     """
 
-    :args request:
-    :return:
+    Args: request:
+    Returns:
     """
-    # FIXME: find a solution to finder
-    # if finders.find(DASHBOARD_HOME_TEMPLATE) is None:
-    #     raise exceptions.DoesNotExist()
-    return render(request, settings.DASHBOARD_HOME_TEMPLATE)
+    return render(request, constants.DASHBOARD_HOME_TEMPLATE)
 
 
-# FIXME: put it back when we will be able to log in
-# @login_required(login_url='/login')
+@login_required(login_url='/login')
 def my_profile(request):
     """
     User's profile information page
-    :args request:
-    :return:
+    Args: request:
+    Returns:
     """
-    return render(request, settings.DASHBOARD_PROFILE_TEMPLATE)
+    return render(request, constants.DASHBOARD_PROFILE_TEMPLATE)
 
 
-# FIXME: put it back when we will be able to log in
-# @login_required(login_url='/login')
+@login_required(login_url='/login')
 def my_profile_edit(request):
     """
 
-    :args request:
-    :return:
+    Args: request:
+    Returns:
     """
     assets = {
         "css": ["core_dashboard_app/css/exploreTabs.css"]
     }
 
     if request.method == 'POST':
-        form = get_edit_profile_form(request=request, url=settings.DASHBOARD_PROFILE_EDIT_TEMPLATE)
+        form = _get_edit_profile_form(request=request, url=constants.DASHBOARD_PROFILE_EDIT_TEMPLATE)
         if form.is_valid():
             user = request.user
             user.first_name = request.POST['firstname']
@@ -67,12 +64,12 @@ def my_profile_edit(request):
             except IntegrityError as e:
                 if 'unique constraint' in e.message:
                     message = "A user with the same username already exists."
-                    return render(request, settings.DASHBOARD_PROFILE_EDIT_TEMPLATE,
+                    return render(request, constants.DASHBOARD_PROFILE_EDIT_TEMPLATE,
                                   context={'form': form, 'action_result': message}, assets=assets)
                 else:
-                    error_while_saving(request, form, assets)
+                    _error_while_saving(request, form, assets)
             except Exception, e:
-                error_while_saving(request, form, assets)
+                _error_while_saving(request, form, assets)
 
             messages.add_message(request, messages.INFO, 'Profile information edited with success.')
             return HttpResponseRedirect(reverse("core_dashboard_profile"))
@@ -82,18 +79,19 @@ def my_profile_edit(request):
                 'lastname': user.last_name,
                 'username': user.username,
                 'email': user.email}
-        form = get_edit_profile_form(request, settings.DASHBOARD_PROFILE_TEMPLATE, data)
+        form = _get_edit_profile_form(request, constants.DASHBOARD_PROFILE_TEMPLATE, data)
 
-    return render(request, settings.DASHBOARD_PROFILE_EDIT_TEMPLATE, context={'form': form}, assets=assets)
+    return render(request, constants.DASHBOARD_PROFILE_EDIT_TEMPLATE, context={'form': form}, assets=assets)
 
 
-def get_edit_profile_form(request, url, data=None):
+def _get_edit_profile_form(request, url, data=None):
     """
+    Edit the profile
 
-    :args request:
-    :args url:
-    :args data:
-    :return:
+    Args: request:
+    Args: url:
+    Args: data:
+    Returns:
     """
     data = request.POST if data is None else data
     try:
@@ -104,15 +102,15 @@ def get_edit_profile_form(request, url, data=None):
                       context={'action_result': message})
 
 
-def error_while_saving(request, form, assets):
+def _error_while_saving(request, form, assets):
     """
     Raise exception if uncatched problems occurred while saving
-    :args request:
-    :args form:
-    :return:
+    Args: request
+    Args: form
+    Returns:
     """
     message = "A problem has occurred while saving the user."
-    return render(request, settings.DASHBOARD_PROFILE_EDIT_TEMPLATE,
+    return render(request, constants.DASHBOARD_PROFILE_EDIT_TEMPLATE,
                   context={'form': form, 'action_result': message}, assets=assets)
 
 
@@ -121,10 +119,10 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
     def get(self, request, *args, **kwargs):
         """
 
-        :args request:
-        :args args:
-        :args kwargs:
-        :return:
+        Args: request:
+        Args: args:
+        Args: kwargs:
+        Returns:
         """
         assets = {
             "css": ["core_dashboard_app/css/exploreTabs.css"]
@@ -134,8 +132,8 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
     def form_valid(self, form):
         """
 
-        :args form:
-        :return:
+        Args: form
+        Returns:
         """
         messages.success(self.request, "Password changed with success.")
         return super(UserDashboardPasswordChangeFormView, self).form_valid(form)
@@ -144,6 +142,9 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
         """
         If the form is invalid, re-render the context data with the
         data-filled form and errors.
+
+        Args: form
+        Returns:
         """
         assets = {
             "css": ["core_dashboard_app/css/exploreTabs.css"]
@@ -173,3 +174,105 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
         else:
             url = reverse('password_change_done')
         return url
+
+
+@login_required(login_url='/login')
+def dashboard_records(request):
+    """
+    List the records
+
+    :Args request:
+    :return:
+    """
+
+    # Get user records
+    user_data = sorted(data_api.get_all_by_user_id(request.user.id),
+                       key=lambda data: data['last_modification_date'], reverse=True)
+
+    # Add user_form for change owner
+    user_form = UserForm(request.user)
+    context = {
+        'user_data': user_data,
+        'user_form': user_form
+    }
+
+    # If the user is an admin, we get records for other users
+    if request.user.is_staff:
+
+        # Get all username and corresponding ids
+        user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
+
+        # Get all records from other users
+        other_users_data = sorted(data_api.get_all_except_user_id(request.user.id),
+                                  key=lambda data: data['last_modification_date'], reverse=True)
+
+        context.update({'other_user_data': other_users_data,
+                        'usernames': user_names,
+                        'action_form': ActionForm([('1', 'Delete selected records'),
+                                                   ('2', 'Change owner of selected records')])})
+
+    modals = [
+        "core_dashboard_app/list/modals/delete_record.html",
+        "core_dashboard_app/list/modals/change_owner.html"
+    ]
+
+    assets = {
+        "css": ['core_main_app/common/css/XMLTree.css',
+                'core_main_app/libs/datatables/1.10.13/css/jquery.dataTables.css'],
+
+        "js": [
+            {
+                "path": 'core_main_app/libs/datatables/1.10.13/js/jquery.dataTables.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/admin/js/select_all.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/user/js/init.js',
+                "is_raw": False
+            },
+            {
+                "path": 'core_dashboard_app/admin/js/count_checked.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/user/js/list/modals/delete_record.js',
+                "is_raw": False
+            },
+            {
+                "path": 'core_dashboard_app/admin/js/init_admin.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/user/js/records_table.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/admin/js/reset_checkbox.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/user/js/list/modals/change_owner.js',
+                "is_raw": False
+            },
+            {
+                "path": 'core_dashboard_app/admin/js/action_dashboard.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/user/js/list/edit_record.js',
+                "is_raw": False
+            },
+            {
+                "path": 'core_dashboard_app/user/js/list/view_record.js',
+                "is_raw": False
+            },
+            {
+                "path": 'core_dashboard_app/user/js/get_selected_record.js',
+                "is_raw": True
+            }
+        ]
+    }
+    return render(request, constants.DASHBOARD_RECORDS_TEMPLATE, context=context, assets=assets, modals=modals)

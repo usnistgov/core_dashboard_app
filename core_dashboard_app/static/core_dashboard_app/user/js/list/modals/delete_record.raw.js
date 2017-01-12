@@ -1,0 +1,1 @@
+var dashboardDeleteRecordUrl = "{% url 'core_dashboard_delete_record' %}";
