@@ -4,7 +4,7 @@
 {% block modal_title %}Delete document{% endblock %}
 
 {% block modal_body %}
-<input type="hidden" class="record-id"/>
+<input type="hidden" class="{{data.document}}-id"/>
 <p>
     The document will be erased.
 </p>
@@ -13,5 +13,5 @@
 
 {% block modal_footer %}
 <a class="btn btn-default pull-left" data-dismiss="modal" href="#"><i class="fa fa-times"></i> No</a>
-<a id="delete-result-yes" class="btn btn-danger" href="#"><i class="fa fa-check"></i> Yes</a>
+<a id="delete-document-yes" class="btn btn-danger" href="#"><i class="fa fa-check"></i> Yes</a>
 {% endblock %}

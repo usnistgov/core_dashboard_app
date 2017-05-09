@@ -1,7 +1,8 @@
 /**
-* Count the number of checked boxes to control visibility of action dropdown
+* Init the tables. Count the number of checked boxes to control visibility of action dropdown
 */
-function initAdmin() {
+function initAdminContext() {
+    initAdmin();
 
     countChecked();
     $( "input[type=checkbox]" ).on( "change", countChecked );

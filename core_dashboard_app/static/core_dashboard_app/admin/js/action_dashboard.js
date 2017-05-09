@@ -3,12 +3,12 @@
 * JS script that allows to do the action on the user dashboard
 */
 action_dashboard = function(selectValue) {
-    // Delete record
+    // Delete document
     if (selectValue == 1) {
-        openDeleteRecord();
+        openDeleteDocument();
     }
-    // Change owner record
+    // Change owner document
     else if (selectValue == 2) {
-        changeOwnerRecord();
+        changeOwnerDocument();
     }
 }

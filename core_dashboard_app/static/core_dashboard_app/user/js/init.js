@@ -4,10 +4,9 @@ $(document).ready(function(){
     });
 
     if (isUserStaff == "True") {
-        initRecordAdmin();
-        initAdmin();
+        initAdminContext();
     } else {
-        initRecordUser();
+        initUser();
     }
     resetCheckbox();
 

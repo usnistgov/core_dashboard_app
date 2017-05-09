@@ -27,7 +27,6 @@
             <div class="tab-content">
               {% if user.is_staff %}
 			  <div class="tab-pane active" id="admin" style="width:98%">
-                  <!--TODO: check perm-->
                 {% if data.user_data %}
                   {% include 'core_dashboard_app/list/my_dashboard_my_records_table.html' with loaded_data=data.user_data group='admin' %}
                 {% else %}
@@ -35,7 +34,6 @@
                 {% endif %}
               </div>
               <div class="tab-pane" id="others" style="width:98%">
-                  <!--TODO: check perm-->
                 {% if data.other_user_data %}
                   {% include 'core_dashboard_app/list/my_dashboard_my_records_table.html' with loaded_data=data.other_user_data group='other' %}
                 {% else %}

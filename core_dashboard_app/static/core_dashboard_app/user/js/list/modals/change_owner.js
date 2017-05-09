@@ -1,10 +1,10 @@
 /**
- * Change record owner
+ * Change document owner
  */
-changeOwnerRecord = function() {
+changeOwnerDocument = function() {
     if (isUserStaff == "False") {
         var $recordRow = $(this).parent().parent();
-        $('.record-id').val($recordRow.attr("objectid"));
+        $('.'+functional_object+'-id').val($recordRow.attr("objectid"));
     }
     $("#banner_errors").hide();
     $("#change-owner-modal").modal("show");
@@ -35,15 +35,16 @@ validateChangeOwner = function(){
 /**
  * AJAX call, change record owner
  */
-change_owner_record = function(){
+change_owner_document = function(){
     var userId = $( "#id_users" ).val().trim();
     $.ajax({
         url : dashboardChangeOwnerUrl,
         type : "POST",
         dataType: "json",
         data : {
-            recordID: getSelectedRecord(),
-            userID: userId
+            document_id: getSelectedDocument(),
+            user_id: userId,
+            functional_object: functional_object
         },
 		success: function(data){
 			location.reload();
@@ -61,10 +62,10 @@ change_owner_record = function(){
 validate_and_change_owner = function () {
     if (validateChangeOwner()) {
         var formData = new FormData($( "#form_start" )[0]);
-        change_owner_record();
+        change_owner_document();
     }
 };
 
 
-$('.change-owner-btn').on('click', changeOwnerRecord);
+$('.change-owner-btn').on('click', changeOwnerDocument);
 $('#change-owner-yes').on('click', validate_and_change_owner);

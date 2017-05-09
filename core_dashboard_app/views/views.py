@@ -19,6 +19,8 @@ from core_main_app.components.user import api as user_api
 from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
 from core_main_app.utils.rendering import render
 from core_main_app.views.admin.forms import EditProfileForm
+import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
+import core_main_app.components.version_manager.api as version_manager_api
 
 
 @login_required(login_url='/login')
@@ -193,7 +195,8 @@ def dashboard_records(request):
     user_form = UserForm(request.user)
     context = {
         'user_data': user_data,
-        'user_form': user_form
+        'user_form': user_form,
+        'document': constants.FUNCTIONAL_OBJECT_ENUM.RECORD
     }
 
     # If the user is an admin, we get records for other users
@@ -212,7 +215,7 @@ def dashboard_records(request):
                                                    ('2', 'Change owner of selected records')])})
 
     modals = [
-        "core_dashboard_app/list/modals/delete_record.html",
+        "core_dashboard_app/list/modals/delete_document.html",
         "core_dashboard_app/list/modals/change_owner.html"
     ]
 
@@ -238,7 +241,7 @@ def dashboard_records(request):
                 "is_raw": True
             },
             {
-                "path": 'core_dashboard_app/user/js/list/modals/delete_record.js',
+                "path": 'core_dashboard_app/user/js/list/modals/delete_document.js',
                 "is_raw": False
             },
             {
@@ -270,9 +273,115 @@ def dashboard_records(request):
                 "is_raw": False
             },
             {
-                "path": 'core_dashboard_app/user/js/get_selected_record.js',
+                "path": 'core_dashboard_app/user/js/get_selected_document.js',
                 "is_raw": True
             }
         ]
     }
     return render(request, constants.DASHBOARD_RECORDS_TEMPLATE, context=context, assets=assets, modals=modals)
+
+
+@login_required(login_url='/login')
+def dashboard_forms(request):
+    """
+    List the forms
+
+    :Args request:
+    Return:
+    """
+
+    # Get the forms
+    forms = curate_data_structure_api.get_all_by_user_id_with_no_data(request.user.id)
+
+    # User Form
+    user_form = UserForm(request.user)
+
+    detailed_forms = []
+    for form in forms:
+        template_name = version_manager_api.get_from_version(form.template).title
+        detailed_forms.append({'form': form,
+                               'template': template_name})
+
+    context = {'forms': detailed_forms,
+               'user_form': user_form,
+               'document': constants.FUNCTIONAL_OBJECT_ENUM.FORM
+               }
+
+    # If the user is an admin, we get records for other users
+    if request.user.is_staff:
+
+        # Get all username and corresponding ids
+        user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
+
+        # Get all forms from other users
+        other_user_forms = curate_data_structure_api.get_all_except_user_id_with_no_data(request.user.id)
+
+        other_detailed_forms = []
+        for form in other_user_forms:
+            template_name = version_manager_api.get_from_version(form.template).title
+            other_detailed_forms.append({'form': form,
+                                         'template': template_name})
+
+        context.update({'other_user_forms': other_detailed_forms,
+                        'usernames': user_names,
+                        'action_form': ActionForm(
+                            [('1', 'Delete selected forms'), ('2', 'Change owner of selected forms')])})
+
+    modals = [
+        "core_dashboard_app/list/modals/delete_document.html",
+        "core_dashboard_app/list/modals/change_owner.html"
+    ]
+
+    assets = {
+        "css": ['core_main_app/common/css/XMLTree.css',
+                'core_main_app/libs/datatables/1.10.13/css/jquery.dataTables.css'],
+
+        "js": [
+            {
+                "path": 'core_main_app/libs/datatables/1.10.13/js/jquery.dataTables.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/admin/js/select_all.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/user/js/init.js',
+                "is_raw": False
+            },
+            {
+                "path": 'core_dashboard_app/admin/js/count_checked.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/user/js/list/modals/delete_document.js',
+                "is_raw": False
+            },
+            {
+                "path": 'core_dashboard_app/admin/js/init_admin.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/user/js/forms_table.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/admin/js/reset_checkbox.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/user/js/list/modals/change_owner.js',
+                "is_raw": False
+            },
+            {
+                "path": 'core_dashboard_app/admin/js/action_dashboard.js',
+                "is_raw": True
+            },
+            {
+                "path": 'core_dashboard_app/user/js/get_selected_document.js',
+                "is_raw": True
+            }
+        ]
+    }
+    return render(request, constants.DASHBOARD_FORMS_TEMPLATE, context=context, assets=assets, modals=modals)
+

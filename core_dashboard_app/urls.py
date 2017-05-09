@@ -15,10 +15,11 @@ urlpatterns = [
         template_name='my_profile_change_password.html', success_url='/'),
         name='core_dashboard_profile_change_password'),
     url(r'^records$', views.dashboard_records, name='core_dashboard_records'),
+    url(r'^forms$', views.dashboard_forms, name='core_dashboard_forms'),
 
 
-    url(r'^delete-record', ajax.delete_record, name='core_dashboard_delete_record'),
-    url(r'^change-owner-record', ajax.change_owner_record, name='core_dashboard_change_owner_record'),
-    url(r'^edit-record', ajax.core_dashboard_edit_record, name='core_dashboard_edit_record')
+    url(r'^delete-document', ajax.delete_document, name='core_dashboard_delete_document'),
+    url(r'^change-owner', ajax.change_owner_document, name='core_dashboard_change_owner_document'),
+    url(r'^edit-record', ajax.edit_record, name='core_dashboard_edit_record')
 
 ]

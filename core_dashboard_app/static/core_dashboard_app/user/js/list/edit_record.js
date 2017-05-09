@@ -16,6 +16,6 @@ openEditRecord = function() {
             window.location = data.url;
         }
     });
-}
+};
 
 $(".edit-record-btn").on('click', openEditRecord);

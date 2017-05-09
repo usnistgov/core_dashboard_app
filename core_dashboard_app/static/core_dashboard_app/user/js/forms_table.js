@@ -1,8 +1,8 @@
 /**
- * Define the table for the records
+ * Define the table for the forms
  */
 function initAdmin() {
-    $('#table-records-admin').DataTable({
+    $('#table-forms-admin').DataTable({
         "scrollY": "226px",
         "iDisplayLength": 5,
         "scrollCollapse": true,
@@ -14,7 +14,7 @@ function initAdmin() {
         "columns": [ { "orderable": false }, null, null, null, { "orderable": false } ]
     });
 
-    $('#table-records-other').DataTable({
+    $('#table-forms-other').DataTable({
         "scrollY": "226px",
         "iDisplayLength": 5,
         "scrollCollapse": true,
@@ -28,7 +28,7 @@ function initAdmin() {
 }
 
 function initUser () {
-    $('#table-records-user').DataTable({
+    $('#table-forms-user').DataTable({
         "scrollY": "226px",
         "iDisplayLength": 5,
         "scrollCollapse": true,

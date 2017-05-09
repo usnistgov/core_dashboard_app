@@ -1,0 +1,1 @@
+var dashboardDeleteDocumentUrl = "{% url 'core_dashboard_delete_document' %}";

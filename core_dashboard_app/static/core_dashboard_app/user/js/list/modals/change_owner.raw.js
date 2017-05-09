@@ -1,1 +1,1 @@
-var dashboardChangeOwnerUrl = "{% url 'core_dashboard_change_owner_record' %}";
+var dashboardChangeOwnerUrl = "{% url 'core_dashboard_change_owner_document' %}";

@@ -1,15 +1,15 @@
 /**
- * Get list of record selected
+ * Get list of document selected
  * @returns {Array}
  */
-getSelectedRecord = function () {
+getSelectedDocument = function () {
     var selected = [];
     if (isUserStaff == "True"){
         $('#actionCheckbox input:checked').each(function() {
             selected.push($(this).attr('id'));
         });
     } else {
-        selected.push($('.record-id').val());
+        selected.push($('.'+functional_object+'-id').val());
     }
     return selected;
 }
