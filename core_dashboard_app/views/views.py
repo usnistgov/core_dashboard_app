@@ -214,71 +214,18 @@ def dashboard_records(request):
                         'action_form': ActionForm([('1', 'Delete selected records'),
                                                    ('2', 'Change owner of selected records')])})
 
-    modals = [
-        "core_dashboard_app/list/modals/delete_document.html",
-        "core_dashboard_app/list/modals/change_owner.html"
-    ]
-
     assets = {
-        "css": ['core_main_app/common/css/XMLTree.css',
-                'core_main_app/libs/datatables/1.10.13/css/jquery.dataTables.css'],
+        "css": constants.CSS_COMMON,
 
-        "js": [
-            {
-                "path": 'core_main_app/libs/datatables/1.10.13/js/jquery.dataTables.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/select_all.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/user/js/init.js',
-                "is_raw": False
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/count_checked.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/user/js/list/modals/delete_document.js',
-                "is_raw": False
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/init_admin.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/user/js/records_table.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/reset_checkbox.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/user/js/list/modals/change_owner.js',
-                "is_raw": False
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/action_dashboard.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/user/js/list/edit_record.js',
-                "is_raw": False
-            },
-            {
-                "path": 'core_dashboard_app/user/js/list/view_record.js',
-                "is_raw": False
-            },
-            {
-                "path": 'core_dashboard_app/user/js/get_selected_document.js',
-                "is_raw": True
-            }
-        ]
+        "js": []
     }
-    return render(request, constants.DASHBOARD_RECORDS_TEMPLATE, context=context, assets=assets, modals=modals)
+
+    _handle_asset(request.user.is_staff, assets, constants.JS_RECORD)
+
+    return render(request, constants.DASHBOARD_RECORDS_TEMPLATE,
+                  context=context,
+                  assets=assets,
+                  modals=constants.MODALS_COMMON)
 
 
 @login_required(login_url='/login')
@@ -327,61 +274,37 @@ def dashboard_forms(request):
                         'action_form': ActionForm(
                             [('1', 'Delete selected forms'), ('2', 'Change owner of selected forms')])})
 
-    modals = [
-        "core_dashboard_app/list/modals/delete_document.html",
-        "core_dashboard_app/list/modals/change_owner.html"
-    ]
-
     assets = {
-        "css": ['core_main_app/common/css/XMLTree.css',
-                'core_main_app/libs/datatables/1.10.13/css/jquery.dataTables.css'],
+        "css": constants.CSS_COMMON,
 
-        "js": [
-            {
-                "path": 'core_main_app/libs/datatables/1.10.13/js/jquery.dataTables.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/select_all.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/user/js/init.js',
-                "is_raw": False
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/count_checked.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/user/js/list/modals/delete_document.js',
-                "is_raw": False
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/init_admin.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/user/js/forms_table.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/reset_checkbox.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/user/js/list/modals/change_owner.js',
-                "is_raw": False
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/action_dashboard.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/user/js/get_selected_document.js',
-                "is_raw": True
-            }
-        ]
+        "js": []
     }
-    return render(request, constants.DASHBOARD_FORMS_TEMPLATE, context=context, assets=assets, modals=modals)
+
+    _handle_asset(request.user.is_staff, assets, constants.JS_FORM)
+
+    return render(request, constants.DASHBOARD_FORMS_TEMPLATE,
+                  context=context,
+                  assets=assets,
+                  modals=constants.MODALS_COMMON)
+
+
+def _handle_asset(user_is_staff, assets, functional_asset):
+    """ Add needed assets
+
+    Args: user_is_staff
+          assets
+          functional_asset
+    Return:
+    """
+
+    # Admin or user assets
+    assets['js'].extend(constants.JS_ADMIN if user_is_staff else constants.JS_USER)
+
+    # Common asset
+    assets['js'].extend(constants.JS_COMMON)
+    assets['js'].extend(constants.JS_COMMON_FUNCTION)
+
+    # Functional asset
+    assets['js'].extend(functional_asset)
+
 

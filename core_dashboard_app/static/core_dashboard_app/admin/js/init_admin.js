@@ -2,7 +2,6 @@
 * Init the tables. Count the number of checked boxes to control visibility of action dropdown
 */
 function initAdminContext() {
-    initAdmin();
 
     countChecked();
     $( "input[type=checkbox]" ).on( "change", countChecked );
@@ -12,4 +11,15 @@ function initAdminContext() {
             .tables( { visible: true, api: true } )
             .columns.adjust();
     })
+
+    $('.paginate_button ').on('click', resetCheckbox);
+}
+
+/**
+ * Init on the admin side
+ */
+function init() {
+    initAdmin();
+    resetCheckbox();
+    initAdminContext();
 }
