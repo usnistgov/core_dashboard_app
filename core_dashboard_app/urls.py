@@ -16,6 +16,7 @@ urlpatterns = [
         name='core_dashboard_profile_change_password'),
     url(r'^records$', views.dashboard_records, name='core_dashboard_records'),
     url(r'^forms$', views.dashboard_forms, name='core_dashboard_forms'),
+    url(r'^templates$', views.dashboard_templates, name='core_dashboard_templates'),
 
 
     url(r'^delete-document', ajax.delete_document, name='core_dashboard_delete_document'),

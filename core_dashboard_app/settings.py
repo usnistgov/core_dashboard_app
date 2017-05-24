@@ -12,7 +12,8 @@ INSTALLED_APPS = getattr(settings, 'INSTALLED_APPS', [])
 
 # Menu
 DASHBOARD_MENU = getattr(settings, 'DASHBOARD_MENU', {
-    'My Forms' : 'core_dashboard_forms',
+    'My Templates': 'core_dashboard_templates',
+    'My Forms': 'core_dashboard_forms',
     'My Records': 'core_dashboard_records',
     'My Profile': 'core_dashboard_profile'
 })

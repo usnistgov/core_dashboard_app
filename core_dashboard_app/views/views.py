@@ -5,22 +5,24 @@
 import json
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.http.response import HttpResponseRedirect
 from django.utils import timezone
 from password_policies.views import PasswordChangeFormView
-from django.contrib.auth.decorators import login_required
 
-from core_dashboard_app import constants
+import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
+import core_main_app.components.version_manager.api as version_manager_api
+from core_dashboard_app import constants as dashboard_constants
 from core_dashboard_app.views.forms import ActionForm, UserForm
 from core_main_app.components.data import api as data_api
+from core_main_app.components.template import api as template_api
+from core_main_app.components.template_version_manager import api as template_version_manager_api
 from core_main_app.components.user import api as user_api
 from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
 from core_main_app.utils.rendering import render
 from core_main_app.views.admin.forms import EditProfileForm
-import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
-import core_main_app.components.version_manager.api as version_manager_api
 
 
 @login_required(login_url='/login')
@@ -30,7 +32,7 @@ def home(request):
     Args: request:
     Returns:
     """
-    return render(request, constants.DASHBOARD_HOME_TEMPLATE)
+    return render(request, dashboard_constants.DASHBOARD_HOME_TEMPLATE)
 
 
 @login_required(login_url='/login')
@@ -40,7 +42,7 @@ def my_profile(request):
     Args: request:
     Returns:
     """
-    return render(request, constants.DASHBOARD_PROFILE_TEMPLATE)
+    return render(request, dashboard_constants.DASHBOARD_PROFILE_TEMPLATE)
 
 
 @login_required(login_url='/login')
@@ -55,7 +57,7 @@ def my_profile_edit(request):
     }
 
     if request.method == 'POST':
-        form = _get_edit_profile_form(request=request, url=constants.DASHBOARD_PROFILE_EDIT_TEMPLATE)
+        form = _get_edit_profile_form(request=request, url=dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE)
         if form.is_valid():
             user = request.user
             user.first_name = request.POST['firstname']
@@ -66,7 +68,7 @@ def my_profile_edit(request):
             except IntegrityError as e:
                 if 'unique constraint' in e.message:
                     message = "A user with the same username already exists."
-                    return render(request, constants.DASHBOARD_PROFILE_EDIT_TEMPLATE,
+                    return render(request, dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE,
                                   context={'form': form, 'action_result': message}, assets=assets)
                 else:
                     _error_while_saving(request, form, assets)
@@ -81,9 +83,9 @@ def my_profile_edit(request):
                 'lastname': user.last_name,
                 'username': user.username,
                 'email': user.email}
-        form = _get_edit_profile_form(request, constants.DASHBOARD_PROFILE_TEMPLATE, data)
+        form = _get_edit_profile_form(request, dashboard_constants.DASHBOARD_PROFILE_TEMPLATE, data)
 
-    return render(request, constants.DASHBOARD_PROFILE_EDIT_TEMPLATE, context={'form': form}, assets=assets)
+    return render(request, dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE, context={'form': form}, assets=assets)
 
 
 def _get_edit_profile_form(request, url, data=None):
@@ -112,7 +114,7 @@ def _error_while_saving(request, form, assets):
     Returns:
     """
     message = "A problem has occurred while saving the user."
-    return render(request, constants.DASHBOARD_PROFILE_EDIT_TEMPLATE,
+    return render(request, dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE,
                   context={'form': form, 'action_result': message}, assets=assets)
 
 
@@ -196,7 +198,7 @@ def dashboard_records(request):
     context = {
         'user_data': user_data,
         'user_form': user_form,
-        'document': constants.FUNCTIONAL_OBJECT_ENUM.RECORD
+        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD
     }
 
     # If the user is an admin, we get records for other users
@@ -214,18 +216,20 @@ def dashboard_records(request):
                         'action_form': ActionForm([('1', 'Delete selected records'),
                                                    ('2', 'Change owner of selected records')])})
 
+    modals = []
+
     assets = {
-        "css": constants.CSS_COMMON,
+        "css": dashboard_constants.CSS_COMMON,
 
         "js": []
     }
 
-    _handle_asset(request.user.is_staff, assets, constants.JS_RECORD)
+    _handle_asset_modals(request.user.is_staff, assets, modals, dashboard_constants.JS_RECORD, True, True)
 
-    return render(request, constants.DASHBOARD_RECORDS_TEMPLATE,
+    return render(request, dashboard_constants.DASHBOARD_RECORDS_TEMPLATE,
                   context=context,
                   assets=assets,
-                  modals=constants.MODALS_COMMON)
+                  modals=modals)
 
 
 @login_required(login_url='/login')
@@ -251,7 +255,7 @@ def dashboard_forms(request):
 
     context = {'forms': detailed_forms,
                'user_form': user_form,
-               'document': constants.FUNCTIONAL_OBJECT_ENUM.FORM
+               'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FORM
                }
 
     # If the user is an admin, we get records for other users
@@ -274,37 +278,132 @@ def dashboard_forms(request):
                         'action_form': ActionForm(
                             [('1', 'Delete selected forms'), ('2', 'Change owner of selected forms')])})
 
+    modals = []
+
     assets = {
-        "css": constants.CSS_COMMON,
+        "css": dashboard_constants.CSS_COMMON,
 
         "js": []
     }
 
-    _handle_asset(request.user.is_staff, assets, constants.JS_FORM)
+    _handle_asset_modals(request.user.is_staff, assets, modals, dashboard_constants.JS_FORM, True, True)
 
-    return render(request, constants.DASHBOARD_FORMS_TEMPLATE,
+    return render(request, dashboard_constants.DASHBOARD_FORMS_TEMPLATE,
                   context=context,
                   assets=assets,
-                  modals=constants.MODALS_COMMON)
+                  modals=modals)
 
 
-def _handle_asset(user_is_staff, assets, functional_asset):
+@login_required(login_url='/login')
+def dashboard_templates(request):
+    """
+    List the templates
+
+    :Args request:
+    :return:
+    """
+
+    # Get user templates
+    user_template_versions = template_version_manager_api.get_all_by_user_id(request.user.id)
+    detailed_user_template = []
+    for user_template_version in user_template_versions:
+
+        detailed_user_template.append({'template_version': user_template_version,
+                                       'template': template_api.get(user_template_version.current),
+                                       'user': request.user.username,
+                                       'title': user_template_version.title
+                                       })
+
+    # Add user_form for change owner
+    user_form = UserForm(request.user)
+    context = {
+        'user_data': detailed_user_template,
+        'user_form': user_form,
+        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TEMPLATE,
+        'object_name': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TEMPLATE
+    }
+    # If the user is an admin, we get records for other users
+    if request.user.is_staff:
+
+        # Get all templates from other users
+        other_template_versions = template_version_manager_api.get_all_version_manager_except_user_id(request.user.id)
+
+        detailed_other_users_templates = []
+        for other_template_version in other_template_versions:
+
+            # If the version manager doesn't have a user, the template is global.
+            if other_template_version.user is not None:
+                detailed_other_users_templates.append({'template_version': other_template_version,
+                                                       'template': template_api.get(other_template_version.current),
+                                                       'user': user_api.get_user_by_id(other_template_version.user).username,
+                                                       'title': other_template_version.title})
+
+        context.update({'other_users_data': detailed_other_users_templates})
+
+    modals = [
+                "core_main_app/admin/templates/list/modals/edit.html",
+                "core_main_app/admin/templates/list/modals/disable.html"
+            ]
+
+    assets = {
+        "css": dashboard_constants.CSS_COMMON,
+
+        "js": []
+    }
+
+    main_assets = [
+                    {
+                        "path": 'core_main_app/common/js/templates/list/restore.js',
+                        "is_raw": False
+                    },
+                    {
+                        "path": 'core_main_app/common/js/templates/list/modals/edit.js',
+                        "is_raw": False
+                    },
+                    {
+                        "path": 'core_main_app/common/js/templates/list/modals/disable.js',
+                        "is_raw": False
+                    }
+                ]
+
+    _handle_asset_modals(request.user.is_staff, assets, modals,
+                         [dashboard_constants.JS_TEMPLATE_TYPE, main_assets],
+                         delete=False,
+                         change_owner=False)
+
+    return render(request, dashboard_constants.DASHBOARD_TEMPLATES_AND_TYPES_TEMPLATE,
+                  context=context,
+                  assets=assets,
+                  modals=modals)
+
+
+def _handle_asset_modals(user_is_staff, assets, modal, functional_asset, delete=False, change_owner=False):
     """ Add needed assets
 
     Args: user_is_staff
           assets
+          modal
           functional_asset
+          delete
+          change_owner
     Return:
     """
 
     # Admin or user assets
-    assets['js'].extend(constants.JS_ADMIN if user_is_staff else constants.JS_USER)
+    assets['js'].extend(dashboard_constants.JS_ADMIN if user_is_staff else dashboard_constants.JS_USER)
 
     # Common asset
-    assets['js'].extend(constants.JS_COMMON)
-    assets['js'].extend(constants.JS_COMMON_FUNCTION)
+    assets['js'].extend(dashboard_constants.JS_COMMON)
+    if delete:
+        assets['js'].extend(dashboard_constants.JS_COMMON_FUNCTION_DELETE)
+        modal.extend(dashboard_constants.MODALS_COMMON_DELETE)
+    if change_owner:
+        assets['js'].extend(dashboard_constants.JS_COMMON_FUNCTION_CHANGE_OWNER)
+        modal.extend(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
 
     # Functional asset
-    assets['js'].extend(functional_asset)
-
-
+    if type(functional_asset) is list:
+        for asset in functional_asset:
+            assets['js'].extend(asset)
+    else:
+        assets['js'].extend(functional_asset)

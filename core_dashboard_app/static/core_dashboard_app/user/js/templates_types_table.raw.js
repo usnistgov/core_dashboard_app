@@ -1,0 +1,1 @@
+var object = '{{data.document}}'

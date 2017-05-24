@@ -1,0 +1,57 @@
+{% load staticfiles %}
+
+{% block title %}
+    <h1><span>{% if user.is_staff %}All {%else%}My {% endif %}{{data.document}}{% if user.is_staff %}s{% endif %}</span></h1>
+{% endblock %}
+
+{% block content %}
+    {% if user.is_staff %}
+    <ul  class="nav nav-tabs">
+                <li class="active"> <a href="#admin" data-toggle="tab" onclick="resetCheckbox();" style="text-decoration:none;">Admin</a> </li>
+                <li><a href="#others" data-toggle="tab" onclick="resetCheckbox();" style="text-decoration:none;">Others</a> </li>
+    </ul>
+    <div class="dropdown" id="id_actions" style="display:none">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Choose action
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            {% for value, text in data.action_form.fields.actions.choices %}
+                <li style="cursor:  pointer;" onclick="action_dashboard({{value}});">{{text}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {%endif%}
+
+    <div class="tab-content">
+        {% if user.is_staff %}
+          <div class="tab-pane active" id="admin" style="width:98%">
+            {% if data.user_data %}
+                {% include 'core_dashboard_app/list/my_dashboard_my_templates_and_types_table.html' with objects=data.user_data group='admin' %}
+            {% else %}
+            <div class="empty-table">
+                You don't currently own any {{ data.document }}.
+            </div>
+            {% endif %}
+          </div>
+          <div class="tab-pane" id="others" style="width:98%">
+            {% if data.other_users_data%}
+                {% include 'core_dashboard_app/list/my_dashboard_my_templates_and_types_table.html' with objects=data.other_users_data group='other' %}
+            {%else%}
+              <div class="empty-table">
+                No other users {{ data.document }}s found
+              </div>
+            {%endif%}
+          </div>
+        {% else %}
+            <div class="tab-pane active" id="user" style="width:98%">
+                {% if data.user_data %}
+                    {% include 'core_dashboard_app/list/my_dashboard_my_templates_and_types_table.html' with objects=data.user_data group='user' %}
+                {% else %}
+                    No {{data.document}}s found.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
