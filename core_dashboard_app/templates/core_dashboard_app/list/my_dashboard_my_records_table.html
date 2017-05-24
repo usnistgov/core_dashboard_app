@@ -5,7 +5,7 @@
         {% if user.is_staff %}
             <th> <input type="checkbox" id="select_all_{{group}}" onchange="selectAll(this, '{{group}}')"> </th>
         {% endif %}
-        <th>Resource name</th>
+        <th>Name</th>
         <th>Last Modification date</th>
         {% if user.is_staff %}
             <th>User</th>

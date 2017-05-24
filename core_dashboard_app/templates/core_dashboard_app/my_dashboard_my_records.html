@@ -1,7 +1,7 @@
 {% load staticfiles %}
 
 {% block title %}
-    <h1><span>{% if not user.is_staff %}My {% endif %}Published Records</span></h1>
+    <h1><span>{% if not user.is_staff %}My {% endif %}Records</span></h1>
 {% endblock %}
 
 {% block content %}
@@ -37,7 +37,7 @@
                 {% if data.other_user_data %}
                   {% include 'core_dashboard_app/list/my_dashboard_my_records_table.html' with loaded_data=data.other_user_data group='other' %}
                 {% else %}
-                    No other users published records found.
+                    No other users records found.
                 {% endif %}
               </div>
              {% else %}
