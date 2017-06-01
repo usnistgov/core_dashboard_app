@@ -348,26 +348,22 @@ def dashboard_templates(request):
     assets = {
         "css": dashboard_constants.CSS_COMMON,
 
-        "js": []
+        "js": [{
+                    "path": 'core_main_app/common/js/templates/list/restore.js',
+                    "is_raw": False
+                },
+                {
+                    "path": 'core_main_app/common/js/templates/list/modals/edit.js',
+                    "is_raw": False
+                },
+                {
+                    "path": 'core_main_app/common/js/templates/list/modals/disable.js',
+                    "is_raw": False
+                }]
     }
 
-    main_assets = [
-                    {
-                        "path": 'core_main_app/common/js/templates/list/restore.js',
-                        "is_raw": False
-                    },
-                    {
-                        "path": 'core_main_app/common/js/templates/list/modals/edit.js',
-                        "is_raw": False
-                    },
-                    {
-                        "path": 'core_main_app/common/js/templates/list/modals/disable.js',
-                        "is_raw": False
-                    }
-                ]
-
     _handle_asset_modals(request.user.is_staff, assets, modals,
-                         [dashboard_constants.JS_TEMPLATE_TYPE, main_assets],
+                         dashboard_constants.JS_TEMPLATE_TYPE,
                          delete=False,
                          change_owner=False)
 
@@ -402,8 +398,4 @@ def _handle_asset_modals(user_is_staff, assets, modal, functional_asset, delete=
         modal.extend(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
 
     # Functional asset
-    if type(functional_asset) is list:
-        for asset in functional_asset:
-            assets['js'].extend(asset)
-    else:
-        assets['js'].extend(functional_asset)
+    assets['js'].extend(functional_asset)
