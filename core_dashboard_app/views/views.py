@@ -6,7 +6,7 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import IntegrityError
 from django.http.response import HttpResponseRedirect
 from django.utils import timezone
@@ -25,7 +25,7 @@ from core_main_app.utils.rendering import render
 from core_main_app.views.admin.forms import EditProfileForm
 
 
-@login_required(login_url='/login')
+@login_required(login_url=reverse_lazy("core_main_app_login"))
 def home(request):
     """
 
@@ -35,7 +35,7 @@ def home(request):
     return render(request, dashboard_constants.DASHBOARD_HOME_TEMPLATE)
 
 
-@login_required(login_url='/login')
+@login_required(login_url=reverse_lazy("core_main_app_login"))
 def my_profile(request):
     """
     User's profile information page
@@ -45,7 +45,7 @@ def my_profile(request):
     return render(request, dashboard_constants.DASHBOARD_PROFILE_TEMPLATE)
 
 
-@login_required(login_url='/login')
+@login_required(login_url=reverse_lazy("core_main_app_login"))
 def my_profile_edit(request):
     """
 
@@ -180,7 +180,7 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
         return url
 
 
-@login_required(login_url='/login')
+@login_required(login_url=reverse_lazy("core_main_app_login"))
 def dashboard_records(request):
     """
     List the records
@@ -232,7 +232,7 @@ def dashboard_records(request):
                   modals=modals)
 
 
-@login_required(login_url='/login')
+@login_required(login_url=reverse_lazy("core_main_app_login"))
 def dashboard_forms(request):
     """
     List the forms
@@ -294,7 +294,7 @@ def dashboard_forms(request):
                   modals=modals)
 
 
-@login_required(login_url='/login')
+@login_required(login_url=reverse_lazy("core_main_app_login"))
 def dashboard_templates(request):
     """
     List the templates
