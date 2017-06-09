@@ -31,7 +31,8 @@ class UserForm(forms.Form):
 
         # We add them
         for user in sort_users:
-            self.USERS_OPTIONS.append((user.id, user.username))
+            if user.id != currentUser.id:
+                self.USERS_OPTIONS.append((user.id, user.username))
 
         super(UserForm, self).__init__()
         self.fields['users'].choices = []
