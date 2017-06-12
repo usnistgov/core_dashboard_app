@@ -14,11 +14,13 @@ from core_dashboard_app import constants
 
 
 def _check_rights_document(request_user_is_staff, request_user_id, document_user):
-    """ Checks if the user is staff or if the document belongs to the user
+    """ Check if the user is staff or if the document belongs to the user.
 
-    Args: request_user_is_staff:
-          request_user_id:
-          document_user:
+    Args:
+        request_user_is_staff:
+        request_user_id:
+        document_user:
+
     Returns:
     """
     if not request_user_is_staff and str(request_user_id) != str(document_user):
@@ -26,13 +28,15 @@ def _check_rights_document(request_user_is_staff, request_user_id, document_user
 
 
 def _get_forms(form_ids, request_user_is_staff, request_user_id):
-    """
-    Gets all the forms from the list of ids
+    """ Get all the forms from the list of ids.
 
-    Args: form_ids:
-          request_user_is_staff:
-          request_user_id:
-    Returns: list form
+    Args:
+        form_ids:
+        request_user_is_staff:
+        request_user_id:
+
+    Returns:
+        list form
     """
 
     list_form = []
@@ -54,13 +58,15 @@ def _get_forms(form_ids, request_user_is_staff, request_user_id):
 
 
 def _get_data(data_ids, request_user_is_staff, request_user_id):
-    """
-    Gets all the data from the list of ids
+    """ Get all the data from the list of ids.
 
-    Args: data_ids:
-          request_user_is_staff:
-          request_user_id:
-    Returns: data table
+    Args:
+        data_ids:
+        request_user_is_staff:
+        request_user_id:
+
+    Returns:
+        data table
     """
 
     data_table = []
@@ -84,10 +90,11 @@ def _get_data(data_ids, request_user_is_staff, request_user_id):
 
 # FIXME: fix error message
 def delete_document(request):
-    """
-        Deletes a document (record or form).
+    """ Delete a document (record or form).
 
-    Args: request:
+    Args:
+        request:
+
     Returns:
     """
     document = request.POST['functional_object']
@@ -105,11 +112,12 @@ def delete_document(request):
 
 
 def _delete_form(request, form_ids):
-    """
-        Deletes forms
+    """ Delete forms.
 
-        Args: request:
-              form_ids:
+        Args:
+            request:
+            form_ids:
+
         Returns:
         """
     try:
@@ -129,11 +137,12 @@ def _delete_form(request, form_ids):
 
 
 def _delete_record(request, data_ids):
-    """
-        Deletes records
+    """ Delete records.
 
-    Args: request:
-          data_ids:
+    Args:
+        request:
+        data_ids:
+
     Returns:
     """
 
@@ -154,10 +163,11 @@ def _delete_record(request, data_ids):
 
 
 def change_owner_document(request):
-    """
-        Changes owner of a document (record or form).
+    """ Change owner of a document (record or form).
 
-    Args: request:
+    Args:
+        request:
+
     Returns:
     """
 
@@ -181,11 +191,13 @@ def change_owner_document(request):
 
 
 def _change_owner_form(request, form_ids, user_id):
-    """
-        Changes the owner of a form.
-    Args: request:
-          data_ids:
-          user_id:
+    """ Change the owner of a form.
+
+    Args:
+        request:
+        data_ids:
+        user_id:
+
     Returns:
     """
     try:
@@ -207,11 +219,13 @@ def _change_owner_form(request, form_ids, user_id):
 
 # FIXME: fix error message
 def _change_owner_record(request, data_ids, user_id):
-    """
-        Changes the owner of a record.
-    Args: request:
-          data_ids:
-          user_id:
+    """ Change the owner of a record.
+
+    Args:
+        request:
+        data_ids:
+        user_id:
+
     Returns:
     """
     try:
@@ -231,10 +245,11 @@ def _change_owner_record(request, data_ids, user_id):
 
 
 def edit_record(request):
-    """
-        Edits a record.
+    """ Edit a record.
 
-    Args: request:
+    Args:
+        request:
+
     Returns:
     """
     try:

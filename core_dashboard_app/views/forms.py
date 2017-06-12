@@ -4,7 +4,7 @@ from core_main_app.components.user.api import get_all_users
 
 class ActionForm(forms.Form):
     """
-    Form to select the action in the user dashboard
+    Form to select the action in the user dashboard.
     """
     actions = forms.ChoiceField(label='', required=True, choices=[])
 
@@ -15,7 +15,7 @@ class ActionForm(forms.Form):
 
 class UserForm(forms.Form):
     """
-    Form to select a user
+    Form to select a user.
     """
     users = forms.ChoiceField(label='', required=True)
     USERS_OPTIONS = []

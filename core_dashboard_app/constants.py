@@ -1,3 +1,6 @@
+"""
+    User Dashboard constants
+"""
 from core_dashboard_app.enum import enum
 
 

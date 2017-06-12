@@ -4,9 +4,10 @@
 
 
 def enum(**enums):
-    """ Create an enumeration based on the args
+    """ Create an enumeration based on the args.
 
-    Args: enums:
+    Args:
+        enums
 
     Returns:
     """

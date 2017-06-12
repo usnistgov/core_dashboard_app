@@ -27,9 +27,11 @@ from core_main_app.views.admin.forms import EditProfileForm
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
 def home(request):
-    """
+    """ Home page.
 
-    Args: request:
+    Args:
+        request:
+
     Returns:
     """
     return render(request, dashboard_constants.DASHBOARD_HOME_TEMPLATE)
@@ -37,9 +39,11 @@ def home(request):
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
 def my_profile(request):
-    """
-    User's profile information page
-    Args: request:
+    """ User's profile information page.
+
+    Args:
+        request:
+
     Returns:
     """
     return render(request, dashboard_constants.DASHBOARD_PROFILE_TEMPLATE)
@@ -47,9 +51,11 @@ def my_profile(request):
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
 def my_profile_edit(request):
-    """
+    """ Edit the profile.
 
-    Args: request:
+    Args:
+        request:
+
     Returns:
     """
     assets = {
@@ -89,12 +95,13 @@ def my_profile_edit(request):
 
 
 def _get_edit_profile_form(request, url, data=None):
-    """
-    Edit the profile
+    """ Edit the profile.
 
-    Args: request:
-    Args: url:
-    Args: data:
+    Args:
+        request
+        url
+        data
+
     Returns:
     """
     data = request.POST if data is None else data
@@ -107,10 +114,12 @@ def _get_edit_profile_form(request, url, data=None):
 
 
 def _error_while_saving(request, form, assets):
-    """
-    Raise exception if uncatched problems occurred while saving
-    Args: request
-    Args: form
+    """ Raise exception if uncatched problems occurred while saving.
+
+    Args:
+        request
+        form
+
     Returns:
     """
     message = "A problem has occurred while saving the user."
@@ -182,11 +191,11 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
 def dashboard_records(request):
-    """
-    List the records
+    """ List the records.
 
-    :Args request:
-    :return:
+    Args:
+        request:
+    Return:
     """
 
     # Get user records
@@ -234,10 +243,11 @@ def dashboard_records(request):
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
 def dashboard_forms(request):
-    """
-    List the forms
+    """ List the forms.
 
-    :Args request:
+    Args:
+         request:
+
     Return:
     """
 
@@ -296,11 +306,12 @@ def dashboard_forms(request):
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
 def dashboard_templates(request):
-    """
-    List the templates
+    """ List the templates.
 
-    :Args request:
-    :return:
+    Args:
+        request:
+
+    Return:
     """
 
     # Get user templates
@@ -374,14 +385,16 @@ def dashboard_templates(request):
 
 
 def _handle_asset_modals(user_is_staff, assets, modal, functional_asset, delete=False, change_owner=False):
-    """ Add needed assets
+    """ Add needed assets.
 
-    Args: user_is_staff
-          assets
-          modal
-          functional_asset
-          delete
-          change_owner
+    Args:
+        user_is_staff
+        assets
+        modal
+        functional_asset
+        delete
+        change_owner
+
     Return:
     """
 

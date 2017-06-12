@@ -1,5 +1,5 @@
 """
-Django settings for core_dashboard_app app.
+    Django settings for core_dashboard_app app
 """
 from django.conf import settings
 

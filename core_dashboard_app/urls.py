@@ -1,4 +1,5 @@
-""" Url router for the user dashboard
+"""
+    Url router for the user dashboard
 """
 from core_dashboard_app.views import views
 from core_dashboard_app.views import ajax
