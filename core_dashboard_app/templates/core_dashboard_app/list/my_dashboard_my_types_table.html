@@ -2,7 +2,7 @@
 
 <table id="table-{{data.document}}-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
     <thead>
-        <th>{% if data.document == "template" %}Template{% elif data.document == "type" %}Type{% endif %} name</th>
+        <th>Type name</th>
         <th>Filename</th>
         {% if user.is_staff %}
             <th>User</th>
@@ -11,29 +11,29 @@
     </thead>
     <tbody>
         {% for object in objects %}
-            <tr objectid="{{object.template_version.id}}">
+            <tr class="{{ rowcolors }}" objectid="{{object.type_version.id}}">
                 <td>{{ object.title }}</td>
-                <td>{{ object.template.filename }}</td>
+                <td>{{ object.type.filename }}</td>
                 {% if user.is_staff %}
                     <td>
                         {{object.user}}
                     </td>
                 {% endif %}
                 <td>
-                    {% if object.template_version.is_disabled %}
-                    <a class="btn btn-default restore-{{data.document}}-btn" objectid="{{ object.template_version.id }}">
+                    {% if object.type_version.is_disabled %}
+                    <a class="btn btn-default restore-{{data.document}}-btn" objectid="{{ object.type_version.id }}">
                         <i class="fa fa-undo"></i> Restore
                     </a>
                     {% else %}
-                    <a class="btn btn-default view-{{data.document}}-btn" href="{% url 'core_main_app_manage_template_versions' object.template_version.id %}">
+                    <a class="btn btn-default view-{{data.document}}-btn" href="{% url 'core_composer_app_manage_type_versions' object.type_version.id %}">
                         <i class="fa fa-list"></i> Versions
                     </a>
 
-                    <a class="btn btn-default edit-{{data.document}}-btn" objectid="{{ object.template_version.id }}">
+                    <a class="btn btn-default edit-{{data.document}}-btn" objectid="{{ object.type_version.id }}">
                         <i class="fa fa-edit"></i> Edit
                     </a>
 
-                    <a class="btn btn-default disable-{{data.document}}-btn" objectid="{{ object.template_version.id }}">
+                    <a class="btn btn-default disable-{{data.document}}-btn" objectid="{{ object.type_version.id }}">
                         <i class="fa fa-trash"></i> Disable
                     </a>
                     {% endif %}

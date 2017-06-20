@@ -5,7 +5,7 @@ from core_dashboard_app.views import views
 from core_dashboard_app.views import ajax
 from django.conf.urls import url
 from core_dashboard_app.views.views import UserDashboardPasswordChangeFormView
-
+# FIXME: case of uninstall app
 urlpatterns = [
 
     # Common
@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^records$', views.dashboard_records, name='core_dashboard_records'),
     url(r'^forms$', views.dashboard_forms, name='core_dashboard_forms'),
     url(r'^templates$', views.dashboard_templates, name='core_dashboard_templates'),
+    url(r'^types$', views.dashboard_types, name='core_dashboard_types'),
 
 
     url(r'^delete-document', ajax.delete_document, name='core_dashboard_delete_document'),

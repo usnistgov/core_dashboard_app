@@ -1,6 +1,7 @@
 """
     Views available for the user
 """
+# FIXME: case of uninstall app
 
 import json
 
@@ -23,6 +24,8 @@ from core_main_app.components.user import api as user_api
 from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
 from core_main_app.utils.rendering import render
 from core_main_app.views.admin.forms import EditProfileForm
+from core_composer_app.components.type_version_manager import api as type_version_manager_api
+from core_composer_app.components.type import api as type_api
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
@@ -331,7 +334,8 @@ def dashboard_templates(request):
         'user_data': detailed_user_template,
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TEMPLATE,
-        'object_name': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TEMPLATE
+        'object_name': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TEMPLATE,
+        'template': dashboard_constants.DASHBOARD_TEMPLATES_TEMPLATE_TABLE
     }
     # If the user is an admin, we get records for other users
     if request.user.is_staff:
@@ -350,6 +354,85 @@ def dashboard_templates(request):
                                                        'title': other_template_version.title})
 
         context.update({'other_users_data': detailed_other_users_templates})
+
+    modals = [
+                "core_main_app/admin/templates/list/modals/edit.html",
+                "core_main_app/admin/templates/list/modals/disable.html"
+            ]
+
+    assets = {
+        "css": dashboard_constants.CSS_COMMON,
+
+        "js": [{
+                    "path": 'core_main_app/common/js/templates/list/restore.js',
+                    "is_raw": False
+                },
+                {
+                    "path": 'core_main_app/common/js/templates/list/modals/edit.js',
+                    "is_raw": False
+                },
+                {
+                    "path": 'core_main_app/common/js/templates/list/modals/disable.js',
+                    "is_raw": False
+                }]
+    }
+
+    _handle_asset_modals(request.user.is_staff, assets, modals,
+                         dashboard_constants.JS_TEMPLATE_TYPE,
+                         delete=False,
+                         change_owner=False)
+
+    return render(request, dashboard_constants.DASHBOARD_TEMPLATES_AND_TYPES_TEMPLATE,
+                  context=context,
+                  assets=assets,
+                  modals=modals)
+
+
+@login_required(login_url=reverse_lazy("core_main_app_login"))
+def dashboard_types(request):
+    """
+    List the types
+
+    :Args request:
+    :return:
+    """
+
+    # Get user types
+    user_type_versions = type_version_manager_api.get_version_managers_by_user(request.user.id)
+    detailed_user_type = []
+    for user_type_version in user_type_versions:
+        detailed_user_type.append({'type_version': user_type_version,
+                                   'type': type_api.get(user_type_version.current),
+                                   'user': request.user.username,
+                                   'title': user_type_version.title})
+
+    # Add user_form for change owner
+    user_form = UserForm(request.user)
+    context = {
+        'user_data': detailed_user_type,
+        'user_form': user_form,
+        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TYPE,
+        'object_name': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TYPE,
+        'template': dashboard_constants.DASHBOARD_TYPES_TEMPLATE_TABLE
+    }
+    # If the user is an admin, we get records for other users
+    if request.user.is_staff:
+
+        # Get all types from other users
+        other_type_versions = type_version_manager_api.get_all_version_manager_except_user_id(request.user.id)
+
+        detailed_other_users_types = []
+        for other_type_version in other_type_versions:
+
+            # If the version manager doesn't have a user, the type is global.
+            if other_type_version.user is not None:
+                detailed_other_users_types.append({'type_version': other_type_version,
+                                                   'type': type_api.get(other_type_version.current),
+                                                   'user': user_api.get_user_by_id(other_type_version.user).username,
+                                                   'title': other_type_version.title})
+
+        context.update({'other_users_data': detailed_other_users_types,
+                        'action_form': ActionForm([('1', 'Delete selected types')])})
 
     modals = [
                 "core_main_app/admin/templates/list/modals/edit.html",

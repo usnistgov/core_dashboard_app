@@ -12,6 +12,7 @@ from core_curate_app.components.curate_data_structure.models import CurateDataSt
 from core_main_app.commons.exceptions import DoesNotExist
 from core_dashboard_app import constants
 
+# FIXME: case of uninstall app
 
 def _check_rights_document(request_user_is_staff, request_user_id, document_user):
     """ Check if the user is staff or if the document belongs to the user.

@@ -1,0 +1,45 @@
+{% load dict_key_extras %}
+
+<table id="table-{{data.document}}-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
+    <thead>
+        <th>Template name</th>
+        <th>Filename</th>
+        {% if user.is_staff %}
+            <th>User</th>
+        {% endif %}
+        <th>Actions</th>
+    </thead>
+    <tbody>
+        {% for object in objects %}
+            <tr objectid="{{object.template_version.id}}">
+                <td>{{ object.title }}</td>
+                <td>{{ object.template.filename }}</td>
+                {% if user.is_staff %}
+                    <td>
+                        {{object.user}}
+                    </td>
+                {% endif %}
+                <td>
+                    {% if object.template_version.is_disabled %}
+                    <a class="btn btn-default restore-{{data.document}}-btn" objectid="{{ object.template_version.id }}">
+                        <i class="fa fa-undo"></i> Restore
+                    </a>
+                    {% else %}
+                    <a class="btn btn-default view-{{data.document}}-btn" href="{% url 'core_main_app_manage_template_versions' object.template_version.id %}">
+                        <i class="fa fa-list"></i> Versions
+                    </a>
+
+                    <a class="btn btn-default edit-{{data.document}}-btn" objectid="{{ object.template_version.id }}">
+                        <i class="fa fa-edit"></i> Edit
+                    </a>
+
+                    <a class="btn btn-default disable-{{data.document}}-btn" objectid="{{ object.template_version.id }}">
+                        <i class="fa fa-trash"></i> Disable
+                    </a>
+                    {% endif %}
+
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

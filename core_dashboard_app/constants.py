@@ -3,6 +3,7 @@
 """
 from core_dashboard_app.enum import enum
 
+# FIXME: case of uninstall app
 
 # Templates
 DASHBOARD_HOME_TEMPLATE = 'core_dashboard_app/home.html'
@@ -11,6 +12,10 @@ DASHBOARD_PROFILE_EDIT_TEMPLATE = 'core_dashboard_app/my_profile_edit.html'
 DASHBOARD_RECORDS_TEMPLATE = 'core_dashboard_app/my_dashboard_my_records.html'
 DASHBOARD_FORMS_TEMPLATE = 'core_dashboard_app/my_dashboard_my_forms.html'
 DASHBOARD_TEMPLATES_AND_TYPES_TEMPLATE = 'core_dashboard_app/my_dashboard_my_templates_and_types.html'
+
+# Tables
+DASHBOARD_TEMPLATES_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_templates_table.html'
+DASHBOARD_TYPES_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_types_table.html'
 
 # Assets
 MODALS_COMMON_DELETE = [
@@ -101,4 +106,5 @@ JS_TEMPLATE_TYPE = [{
 
 FUNCTIONAL_OBJECT_ENUM = enum(RECORD='record',
                               FORM='form',
-                              TEMPLATE='template')
+                              TEMPLATE='template',
+                              TYPE='type')

@@ -27,7 +27,7 @@
         {% if user.is_staff %}
           <div class="tab-pane active" id="admin" style="width:98%">
             {% if data.user_data %}
-                {% include 'core_dashboard_app/list/my_dashboard_my_templates_and_types_table.html' with objects=data.user_data group='admin' %}
+                {% include data.template with objects=data.user_data group='admin' %}
             {% else %}
             <div class="empty-table">
                 You don't currently own any {{ data.document }}.
@@ -36,7 +36,7 @@
           </div>
           <div class="tab-pane" id="others" style="width:98%">
             {% if data.other_users_data%}
-                {% include 'core_dashboard_app/list/my_dashboard_my_templates_and_types_table.html' with objects=data.other_users_data group='other' %}
+                {% include data.template with objects=data.other_users_data group='other' %}
             {%else%}
               <div class="empty-table">
                 No other users {{ data.document }}s found
@@ -46,7 +46,7 @@
         {% else %}
             <div class="tab-pane active" id="user" style="width:98%">
                 {% if data.user_data %}
-                    {% include 'core_dashboard_app/list/my_dashboard_my_templates_and_types_table.html' with objects=data.user_data group='user' %}
+                    {% include data.template with objects=data.user_data group='user' %}
                 {% else %}
                     No {{data.document}}s found.
                 {% endif %}
