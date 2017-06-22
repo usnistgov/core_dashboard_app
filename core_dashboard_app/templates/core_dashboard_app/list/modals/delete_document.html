@@ -1,14 +1,14 @@
 {% extends 'core_main_app/_render/admin/theme/tools/modal.html' %}
 
 {% block modal_id %}delete-result-modal{% endblock %}
-{% block modal_title %}Delete document{% endblock %}
+{% block modal_title %}Delete {{data.document}}{% endblock %}
 
 {% block modal_body %}
 <input type="hidden" class="{{data.document}}-id"/>
 <p>
-    The document will be erased.
+    The {{data.document}} will be erased.
 </p>
-<p>Are you sure you want to delete this document?</p>
+<p>Are you sure you want to delete this {{data.document}}?</p>
 {% endblock %}
 
 {% block modal_footer %}

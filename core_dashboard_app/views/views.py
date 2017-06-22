@@ -26,6 +26,7 @@ from core_main_app.utils.rendering import render
 from core_main_app.views.admin.forms import EditProfileForm
 from core_composer_app.components.type_version_manager import api as type_version_manager_api
 from core_composer_app.components.type import api as type_api
+from core_main_app.components.blob import api as blob_api, utils as blob_utils
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
@@ -225,6 +226,7 @@ def dashboard_records(request):
 
         context.update({'other_user_data': other_users_data,
                         'usernames': user_names,
+                        'number_columns': 5,
                         'action_form': ActionForm([('1', 'Delete selected records'),
                                                    ('2', 'Change owner of selected records')])})
 
@@ -233,10 +235,10 @@ def dashboard_records(request):
     assets = {
         "css": dashboard_constants.CSS_COMMON,
 
-        "js": []
+        "js": dashboard_constants.JS_RECORD
     }
 
-    _handle_asset_modals(request.user.is_staff, assets, modals, dashboard_constants.JS_RECORD, True, True)
+    _handle_asset_modals(request.user.is_staff, assets, modals, True, True)
 
     return render(request, dashboard_constants.DASHBOARD_RECORDS_TEMPLATE,
                   context=context,
@@ -288,6 +290,7 @@ def dashboard_forms(request):
 
         context.update({'other_user_forms': other_detailed_forms,
                         'usernames': user_names,
+                        'number_columns': 5,
                         'action_form': ActionForm(
                             [('1', 'Delete selected forms'), ('2', 'Change owner of selected forms')])})
 
@@ -299,7 +302,7 @@ def dashboard_forms(request):
         "js": []
     }
 
-    _handle_asset_modals(request.user.is_staff, assets, modals, dashboard_constants.JS_FORM, True, True)
+    _handle_asset_modals(request.user.is_staff, assets, modals, True, True)
 
     return render(request, dashboard_constants.DASHBOARD_FORMS_TEMPLATE,
                   context=context,
@@ -353,7 +356,8 @@ def dashboard_templates(request):
                                                        'user': user_api.get_user_by_id(other_template_version.user).username,
                                                        'title': other_template_version.title})
 
-        context.update({'other_users_data': detailed_other_users_templates})
+        context.update({'other_users_data': detailed_other_users_templates,
+                        'number_columns': 4})
 
     modals = [
                 "core_main_app/admin/templates/list/modals/edit.html",
@@ -378,11 +382,10 @@ def dashboard_templates(request):
     }
 
     _handle_asset_modals(request.user.is_staff, assets, modals,
-                         dashboard_constants.JS_TEMPLATE_TYPE,
                          delete=False,
                          change_owner=False)
 
-    return render(request, dashboard_constants.DASHBOARD_TEMPLATES_AND_TYPES_TEMPLATE,
+    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
                   assets=assets,
                   modals=modals)
@@ -390,11 +393,11 @@ def dashboard_templates(request):
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
 def dashboard_types(request):
-    """
-    List the types
+    """ List the types.
 
-    :Args request:
-    :return:
+    Args:
+        request:
+    Return:
     """
 
     # Get user types
@@ -432,6 +435,7 @@ def dashboard_types(request):
                                                    'title': other_type_version.title})
 
         context.update({'other_users_data': detailed_other_users_types,
+                        'number_columns': 4,
                         'action_form': ActionForm([('1', 'Delete selected types')])})
 
     modals = [
@@ -457,17 +461,76 @@ def dashboard_types(request):
     }
 
     _handle_asset_modals(request.user.is_staff, assets, modals,
-                         dashboard_constants.JS_TEMPLATE_TYPE,
                          delete=False,
                          change_owner=False)
 
-    return render(request, dashboard_constants.DASHBOARD_TEMPLATES_AND_TYPES_TEMPLATE,
+    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
                   assets=assets,
                   modals=modals)
 
 
-def _handle_asset_modals(user_is_staff, assets, modal, functional_asset, delete=False, change_owner=False):
+@login_required(login_url=reverse_lazy("core_main_app_login"))
+def dashboard_files(request):
+    """ List the files.
+
+    Args:
+        request:
+    Return:
+    """
+    user_files = blob_api.get_all_by_user_id(request.user.id)
+    detailed_user_file = []
+    for user_file in user_files:
+        detailed_user_file.append({'user': request.user.username,
+                                   'date': user_file.id.generation_time,
+                                   'file': user_file,
+                                   'url': blob_utils.get_blob_download_uri(user_file, request)
+                                   })
+
+    context = {
+        'user_data': detailed_user_file,
+        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE,
+        'template': dashboard_constants.DASHBOARD_FILES_TEMPLATE_TABLE
+    }
+
+    # If the user is an admin, we get files of other users
+    if request.user.is_staff:
+
+        # Get all files from other users
+        other_files = blob_api.get_all_except_user_id(request.user.id)
+
+        detailed_other_users_files = []
+        for other_file in other_files:
+            detailed_other_users_files.append({'user': user_api.get_user_by_id(other_file.user_id).username,
+                                               'date': other_file.id.generation_time,
+                                               'file': other_file,
+                                               'url': blob_utils.get_blob_download_uri(other_file, request)
+                                               })
+
+        context.update({'other_users_data': detailed_other_users_files,
+                        'number_columns': 5,
+                        'action_form': ActionForm([('1', 'Delete selected files')])
+                        })
+
+    modals = []
+
+    assets = {
+        "css": dashboard_constants.CSS_COMMON,
+
+        "js": []
+    }
+
+    _handle_asset_modals(request.user.is_staff, assets, modals,
+                         delete=True,
+                         change_owner=False)
+
+    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
+                  context=context,
+                  assets=assets,
+                  modals=modals)
+
+
+def _handle_asset_modals(user_is_staff, assets, modal, delete=False, change_owner=False):
     """ Add needed assets.
 
     Args:
@@ -492,6 +555,3 @@ def _handle_asset_modals(user_is_staff, assets, modal, functional_asset, delete=
     if change_owner:
         assets['js'].extend(dashboard_constants.JS_COMMON_FUNCTION_CHANGE_OWNER)
         modal.extend(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
-
-    # Functional asset
-    assets['js'].extend(functional_asset)

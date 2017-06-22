@@ -1,6 +1,6 @@
 {% load dict_key_extras %}
 
-<table id="table-records-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
+<table id="table-{{data.document}}-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
     <thead>
         {% if user.is_staff %}
             <th> <input type="checkbox" id="select_all_{{group}}" onchange="selectAll(this, '{{group}}')"> </th>

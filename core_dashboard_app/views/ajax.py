@@ -11,8 +11,10 @@ import core_main_app.components.data.api as data_api
 from core_curate_app.components.curate_data_structure.models import CurateDataStructure
 from core_main_app.commons.exceptions import DoesNotExist
 from core_dashboard_app import constants
+from core_main_app.components.blob import api as blob_api
 
 # FIXME: case of uninstall app
+
 
 def _check_rights_document(request_user_is_staff, request_user_id, document_user):
     """ Check if the user is staff or if the document belongs to the user.
@@ -26,6 +28,36 @@ def _check_rights_document(request_user_is_staff, request_user_id, document_user
     """
     if not request_user_is_staff and str(request_user_id) != str(document_user):
         raise Exception("You don't have the rights to perform this action.")
+
+
+def _get_blobs(blob_ids, request_user_is_staff, request_user_id):
+    """ Get all the blobs from the list of ids.
+
+    Args:
+        blob_ids:
+        request_user_is_staff:
+        request_user_id:
+
+    Returns:
+        list form
+    """
+
+    list_blobs = []
+    try:
+        for blob_id in blob_ids:
+            # Get the blob
+            blob = blob_api.get_by_id(blob_id)
+
+            # Check the rights
+            _check_rights_document(request_user_is_staff, request_user_id, blob.user_id)
+
+            list_blobs.append(blob)
+    except DoesNotExist:
+        raise Exception('It seems a blob is missing. Please refresh the page.')
+    except Exception, e:
+        raise Exception(e.message)
+
+    return list_blobs
 
 
 def _get_forms(form_ids, request_user_is_staff, request_user_id):
@@ -108,8 +140,35 @@ def delete_document(request):
         return _delete_record(request, document_ids)
     elif document == constants.FUNCTIONAL_OBJECT_ENUM.FORM:
         return _delete_form(request, document_ids)
+    elif document == constants.FUNCTIONAL_OBJECT_ENUM.FILE:
+        return _delete_file(request, document_ids)
 
     return HttpResponseBadRequest({"Bad entries. Please check the parameters."})
+
+
+def _delete_file(request, blob_ids):
+    """ Delete blobs.
+
+        Args:
+            request:
+            blob_ids:
+
+        Returns:
+        """
+    try:
+        list_blob = _get_blobs(blob_ids, request.user.is_staff, request.user.id)
+    except Exception, e:
+        messages.add_message(request, messages.INFO, e.message)
+        return HttpResponse(json.dumps({}), content_type='application/javascript')
+
+    try:
+        for blob in list_blob:
+            blob_api.delete(blob)
+        messages.add_message(request, messages.INFO, 'Form deleted with success.')
+    except:
+        messages.add_message(request, messages.INFO, 'A problem occurred while deleting.')
+
+    return HttpResponse(json.dumps({}), content_type='application/javascript')
 
 
 def _delete_form(request, form_ids):

@@ -3,10 +3,8 @@
  * Open the modal before deleting the document
  */
 openDeleteDocument = function () {
-    if (isUserStaff == "False") {
-        var $recordRow = $(this).parent().parent();
-        $('.'+functional_object+'-id').val($recordRow.attr("objectid"));
-    }
+    var $recordRow = $(this).parent().parent();
+    $('.'+functional_object+'-id').val($recordRow.attr("objectid"));
     $("#delete-result-modal").modal("show");
 };
 

@@ -19,7 +19,7 @@ urlpatterns = [
     url(r'^forms$', views.dashboard_forms, name='core_dashboard_forms'),
     url(r'^templates$', views.dashboard_templates, name='core_dashboard_templates'),
     url(r'^types$', views.dashboard_types, name='core_dashboard_types'),
-
+    url(r'^files$', views.dashboard_files, name='core_dashboard_files'),
 
     url(r'^delete-document', ajax.delete_document, name='core_dashboard_delete_document'),
     url(r'^change-owner', ajax.change_owner_document, name='core_dashboard_change_owner_document'),

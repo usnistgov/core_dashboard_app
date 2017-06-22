@@ -2,10 +2,8 @@
  * Change document owner
  */
 changeOwnerDocument = function() {
-    if (isUserStaff == "False") {
-        var $recordRow = $(this).parent().parent();
-        $('.'+functional_object+'-id').val($recordRow.attr("objectid"));
-    }
+    var $recordRow = $(this).parent().parent();
+    $('.'+functional_object+'-id').val($recordRow.attr("objectid"));
     $("#banner_errors").hide();
     $("#change-owner-modal").modal("show");
 };
