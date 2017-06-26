@@ -9,11 +9,11 @@ from core_dashboard_app.enum import enum
 DASHBOARD_HOME_TEMPLATE = 'core_dashboard_app/home.html'
 DASHBOARD_PROFILE_TEMPLATE = 'core_dashboard_app/my_profile.html'
 DASHBOARD_PROFILE_EDIT_TEMPLATE = 'core_dashboard_app/my_profile_edit.html'
-DASHBOARD_RECORDS_TEMPLATE = 'core_dashboard_app/my_dashboard_my_records.html'
-DASHBOARD_FORMS_TEMPLATE = 'core_dashboard_app/my_dashboard_my_forms.html'
 DASHBOARD_TEMPLATE = 'core_dashboard_app/my_dashboard.html'
 
 # Tables
+DASHBOARD_RECORDS_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_records_table.html'
+DASHBOARD_FORMS_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_forms_table.html'
 DASHBOARD_TEMPLATES_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_templates_table.html'
 DASHBOARD_TYPES_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_types_table.html'
 DASHBOARD_FILES_TEMPLATE_TABLE='core_dashboard_app/list/my_dashboard_my_files_table.html'
@@ -54,21 +54,22 @@ JS_COMMON = [{
                 "is_raw": False
             }]
 
+JS_ADMIN_MENU = [{
+                    "path": 'core_dashboard_app/admin/js/count_checked.js',
+                    "is_raw": True
+                },
+                {
+                    "path": 'core_dashboard_app/admin/js/reset_checkbox.js',
+                    "is_raw": True
+                },
+                {
+                    "path": 'core_dashboard_app/admin/js/select_all.js',
+                    "is_raw": True
+                }]
+
 JS_ADMIN = [{
-                "path": 'core_dashboard_app/admin/js/count_checked.js',
-                "is_raw": True
-            },
-            {
                 "path": 'core_dashboard_app/admin/js/init_admin.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/reset_checkbox.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/select_all.js',
-                "is_raw": True
+                "is_raw": False
             },
             {
                 "path": 'core_dashboard_app/admin/js/action_dashboard.js',

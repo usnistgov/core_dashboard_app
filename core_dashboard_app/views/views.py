@@ -211,7 +211,8 @@ def dashboard_records(request):
     context = {
         'user_data': user_data,
         'user_form': user_form,
-        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD
+        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
+        'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE
     }
 
     # If the user is an admin, we get records for other users
@@ -224,11 +225,12 @@ def dashboard_records(request):
         other_users_data = sorted(data_api.get_all_except_user_id(request.user.id),
                                   key=lambda data: data['last_modification_date'], reverse=True)
 
-        context.update({'other_user_data': other_users_data,
+        context.update({'other_users_data': other_users_data,
                         'usernames': user_names,
                         'number_columns': 5,
                         'action_form': ActionForm([('1', 'Delete selected records'),
-                                                   ('2', 'Change owner of selected records')])})
+                                                   ('2', 'Change owner of selected records')]),
+                        'menu': True})
 
     modals = []
 
@@ -238,9 +240,9 @@ def dashboard_records(request):
         "js": dashboard_constants.JS_RECORD
     }
 
-    _handle_asset_modals(request.user.is_staff, assets, modals, True, True)
+    _handle_asset_modals(request.user.is_staff, assets, modals, delete=True, change_owner=True, menu=True)
 
-    return render(request, dashboard_constants.DASHBOARD_RECORDS_TEMPLATE,
+    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
                   assets=assets,
                   modals=modals)
@@ -268,9 +270,10 @@ def dashboard_forms(request):
         detailed_forms.append({'form': form,
                                'template': template_name})
 
-    context = {'forms': detailed_forms,
+    context = {'user_data': detailed_forms,
                'user_form': user_form,
-               'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FORM
+               'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FORM,
+               'template': dashboard_constants.DASHBOARD_FORMS_TEMPLATE_TABLE
                }
 
     # If the user is an admin, we get records for other users
@@ -288,11 +291,12 @@ def dashboard_forms(request):
             other_detailed_forms.append({'form': form,
                                          'template': template_name})
 
-        context.update({'other_user_forms': other_detailed_forms,
+        context.update({'other_users_data': other_detailed_forms,
                         'usernames': user_names,
                         'number_columns': 5,
                         'action_form': ActionForm(
-                            [('1', 'Delete selected forms'), ('2', 'Change owner of selected forms')])})
+                            [('1', 'Delete selected forms'), ('2', 'Change owner of selected forms')]),
+                        'menu': True})
 
     modals = []
 
@@ -302,9 +306,9 @@ def dashboard_forms(request):
         "js": []
     }
 
-    _handle_asset_modals(request.user.is_staff, assets, modals, True, True)
+    _handle_asset_modals(request.user.is_staff, assets, modals, delete=True, change_owner=True, menu=True)
 
-    return render(request, dashboard_constants.DASHBOARD_FORMS_TEMPLATE,
+    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
                   assets=assets,
                   modals=modals)
@@ -383,7 +387,8 @@ def dashboard_templates(request):
 
     _handle_asset_modals(request.user.is_staff, assets, modals,
                          delete=False,
-                         change_owner=False)
+                         change_owner=False,
+                         menu=False)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
@@ -436,7 +441,8 @@ def dashboard_types(request):
 
         context.update({'other_users_data': detailed_other_users_types,
                         'number_columns': 4,
-                        'action_form': ActionForm([('1', 'Delete selected types')])})
+                        'action_form': ActionForm([('1', 'Delete selected types')]),
+                        'menu': True})
 
     modals = [
                 "core_main_app/admin/templates/list/modals/edit.html",
@@ -462,7 +468,8 @@ def dashboard_types(request):
 
     _handle_asset_modals(request.user.is_staff, assets, modals,
                          delete=False,
-                         change_owner=False)
+                         change_owner=False,
+                         menu=True)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
@@ -509,7 +516,8 @@ def dashboard_files(request):
 
         context.update({'other_users_data': detailed_other_users_files,
                         'number_columns': 5,
-                        'action_form': ActionForm([('1', 'Delete selected files')])
+                        'action_form': ActionForm([('1', 'Delete selected files')]),
+                        'menu': True
                         })
 
     modals = []
@@ -522,7 +530,8 @@ def dashboard_files(request):
 
     _handle_asset_modals(request.user.is_staff, assets, modals,
                          delete=True,
-                         change_owner=False)
+                         change_owner=False,
+                         menu=True)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
@@ -530,16 +539,16 @@ def dashboard_files(request):
                   modals=modals)
 
 
-def _handle_asset_modals(user_is_staff, assets, modal, delete=False, change_owner=False):
+def _handle_asset_modals(user_is_staff, assets, modal, delete=False, change_owner=False, menu=False):
     """ Add needed assets.
 
     Args:
         user_is_staff
         assets
         modal
-        functional_asset
         delete
         change_owner
+        menu
 
     Return:
     """
@@ -555,3 +564,7 @@ def _handle_asset_modals(user_is_staff, assets, modal, delete=False, change_owne
     if change_owner:
         assets['js'].extend(dashboard_constants.JS_COMMON_FUNCTION_CHANGE_OWNER)
         modal.extend(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
+
+    # Menu
+    if menu and user_is_staff:
+        assets['js'].extend(dashboard_constants.JS_ADMIN_MENU)

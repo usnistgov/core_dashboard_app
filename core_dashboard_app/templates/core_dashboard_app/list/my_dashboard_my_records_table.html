@@ -13,7 +13,7 @@
         <th>Actions</th>
     </thead>
     <tbody>
-        {% for data_loaded in loaded_data %}
+        {% for data_loaded in objects %}
             {% cycle 'even' '' as rowcolors silent %}
             <tr class="{{ rowcolors }}" objectid="{{data_loaded.id}}">
                 {% if user.is_staff %}
