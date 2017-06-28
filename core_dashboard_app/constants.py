@@ -3,7 +3,6 @@
 """
 from core_dashboard_app.enum import enum
 
-# FIXME: case of uninstall app
 
 # Templates
 DASHBOARD_HOME_TEMPLATE = 'core_dashboard_app/home.html'

@@ -6,14 +6,13 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
 
-import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
 import core_main_app.components.data.api as data_api
-from core_curate_app.components.curate_data_structure.models import CurateDataStructure
-from core_main_app.commons.exceptions import DoesNotExist
 from core_dashboard_app import constants
+from core_main_app.commons.exceptions import DoesNotExist
 from core_main_app.components.blob import api as blob_api
-
-# FIXME: case of uninstall app
+from core_main_app.settings import INSTALLED_APPS
+if 'core_curate_app' in INSTALLED_APPS:
+    import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
 
 
 def _check_rights_document(request_user_is_staff, request_user_id, document_user):

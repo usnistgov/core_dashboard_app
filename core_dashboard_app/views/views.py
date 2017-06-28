@@ -1,7 +1,6 @@
 """
     Views available for the user
 """
-# FIXME: case of uninstall app
 
 import json
 
@@ -13,20 +12,23 @@ from django.http.response import HttpResponseRedirect
 from django.utils import timezone
 from password_policies.views import PasswordChangeFormView
 
-import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
 import core_main_app.components.version_manager.api as version_manager_api
 from core_dashboard_app import constants as dashboard_constants
 from core_dashboard_app.views.forms import ActionForm, UserForm
+from core_main_app.components.blob import api as blob_api, utils as blob_utils
 from core_main_app.components.data import api as data_api
 from core_main_app.components.template import api as template_api
 from core_main_app.components.template_version_manager import api as template_version_manager_api
 from core_main_app.components.user import api as user_api
+from core_main_app.settings import INSTALLED_APPS
 from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
 from core_main_app.utils.rendering import render
 from core_main_app.views.admin.forms import EditProfileForm
-from core_composer_app.components.type_version_manager import api as type_version_manager_api
-from core_composer_app.components.type import api as type_api
-from core_main_app.components.blob import api as blob_api, utils as blob_utils
+if 'core_composer_app' in INSTALLED_APPS:
+    from core_composer_app.components.type_version_manager import api as type_version_manager_api
+    from core_composer_app.components.type import api as type_api
+if 'core_curate_app' in INSTALLED_APPS:
+    import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))

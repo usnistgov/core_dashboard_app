@@ -1,11 +1,12 @@
 """
     Url router for the user dashboard
 """
-from core_dashboard_app.views import views
-from core_dashboard_app.views import ajax
 from django.conf.urls import url
+
+from core_dashboard_app.views import ajax
+from core_dashboard_app.views import views
 from core_dashboard_app.views.views import UserDashboardPasswordChangeFormView
-# FIXME: case of uninstall app
+
 urlpatterns = [
 
     # Common
