@@ -64,10 +64,6 @@ def my_profile_edit(request):
 
     Returns:
     """
-    assets = {
-        "css": ["core_dashboard_app/css/exploreTabs.css"]
-    }
-
     if request.method == 'POST':
         form = _get_edit_profile_form(request=request, url=dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE)
         if form.is_valid():
@@ -81,11 +77,11 @@ def my_profile_edit(request):
                 if 'unique constraint' in e.message:
                     message = "A user with the same username already exists."
                     return render(request, dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE,
-                                  context={'form': form, 'action_result': message}, assets=assets)
+                                  context={'form': form, 'action_result': message})
                 else:
-                    _error_while_saving(request, form, assets)
+                    _error_while_saving(request, form)
             except Exception, e:
-                _error_while_saving(request, form, assets)
+                _error_while_saving(request, form)
 
             messages.add_message(request, messages.INFO, 'Profile information edited with success.')
             return HttpResponseRedirect(reverse("core_dashboard_profile"))
@@ -97,7 +93,7 @@ def my_profile_edit(request):
                 'email': user.email}
         form = _get_edit_profile_form(request, dashboard_constants.DASHBOARD_PROFILE_TEMPLATE, data)
 
-    return render(request, dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE, context={'form': form}, assets=assets)
+    return render(request, dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE, context={'form': form})
 
 
 def _get_edit_profile_form(request, url, data=None):
@@ -119,7 +115,7 @@ def _get_edit_profile_form(request, url, data=None):
                       context={'action_result': message})
 
 
-def _error_while_saving(request, form, assets):
+def _error_while_saving(request, form):
     """ Raise exception if uncatched problems occurred while saving.
 
     Args:
@@ -130,7 +126,7 @@ def _error_while_saving(request, form, assets):
     """
     message = "A problem has occurred while saving the user."
     return render(request, dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE,
-                  context={'form': form, 'action_result': message}, assets=assets)
+                  context={'form': form, 'action_result': message})
 
 
 class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
@@ -143,10 +139,7 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
         Args: kwargs:
         Returns:
         """
-        assets = {
-            "css": ["core_dashboard_app/css/exploreTabs.css"]
-        }
-        return render(request, self.template_name, context={'form': self.get_form()}, assets=assets)
+        return render(request, self.template_name, context={'form': self.get_form()})
 
     def form_valid(self, form):
         """
@@ -165,10 +158,7 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
         Args: form
         Returns:
         """
-        assets = {
-            "css": ["core_dashboard_app/css/exploreTabs.css"]
-        }
-        return render(None, self.template_name, context={'form': form}, assets=assets)
+        return render(None, self.template_name, context={'form': form})
 
     def get_success_url(self):
         """
