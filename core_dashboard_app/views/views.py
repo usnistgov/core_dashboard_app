@@ -158,7 +158,7 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
         Args: form
         Returns:
         """
-        return render(None, self.template_name, context={'form': form})
+        return render(self.request, self.template_name, context={'form': form})
 
     def get_success_url(self):
         """
