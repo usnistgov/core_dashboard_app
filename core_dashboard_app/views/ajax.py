@@ -12,6 +12,7 @@ from core_main_app.commons.exceptions import DoesNotExist
 from core_main_app.components.blob import api as blob_api
 from core_main_app.settings import INSTALLED_APPS
 if 'core_curate_app' in INSTALLED_APPS:
+    from core_curate_app.components.curate_data_structure.models import CurateDataStructure
     import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
 
 
