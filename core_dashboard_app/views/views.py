@@ -353,7 +353,7 @@ def dashboard_templates(request):
                                                        'title': other_template_version.title})
 
         context.update({'other_users_data': detailed_other_users_templates,
-                        'number_columns': 4})
+                        'number_columns': 4, 'menu': True})
 
     modals = [
                 "core_main_app/admin/templates/list/modals/edit.html",
