@@ -35,7 +35,8 @@
                 </td>
                 {% endif %}
                 <td>
-                    <a class="btn btn-default view-form-btn" href="{% url 'core_curate_view_form' data_loaded.form.id %}">
+                    <a class="btn btn-default view-form-btn"
+                       href="{% url 'core_dashboard_view_form' data_loaded.form.id %}">
                         <i class="fa fa-file-text-o"></i> View
                     </a>
 

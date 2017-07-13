@@ -1,11 +1,15 @@
 """
     Url router for the user dashboard
 """
+from core_main_app.settings import INSTALLED_APPS
 from django.conf.urls import url
 
 from core_dashboard_app.views import ajax
 from core_dashboard_app.views import views
 from core_dashboard_app.views.views import UserDashboardPasswordChangeFormView
+
+if 'core_curate_app' in INSTALLED_APPS:
+    from core_curate_app.views.user import views as curate_user_views
 
 urlpatterns = [
 
@@ -24,6 +28,8 @@ urlpatterns = [
 
     url(r'^delete-document', ajax.delete_document, name='core_dashboard_delete_document'),
     url(r'^change-owner', ajax.change_owner_document, name='core_dashboard_change_owner_document'),
-    url(r'^edit-record', ajax.edit_record, name='core_dashboard_edit_record')
+    url(r'^edit-record', ajax.edit_record, name='core_dashboard_edit_record'),
+    url(r'^view-form/(?P<curate_data_structure_id>\w+)$', curate_user_views.view_form,
+        name='core_dashboard_view_form'),
 
 ]
