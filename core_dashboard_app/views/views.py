@@ -380,7 +380,7 @@ def dashboard_templates(request):
     _handle_asset_modals(request.user.is_staff, assets, modals,
                          delete=False,
                          change_owner=False,
-                         menu=False)
+                         menu=True)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
