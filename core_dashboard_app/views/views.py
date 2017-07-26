@@ -195,7 +195,7 @@ def dashboard_records(request):
     """
 
     # Get user records
-    user_data = sorted(data_api.get_all_by_user_id(request.user.id),
+    user_data = sorted(data_api.get_all(request.user),
                        key=lambda data: data['last_modification_date'], reverse=True)
 
     # Add user_form for change owner
@@ -214,7 +214,7 @@ def dashboard_records(request):
         user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
 
         # Get all records from other users
-        other_users_data = sorted(data_api.get_all_except_user_id(request.user.id),
+        other_users_data = sorted(data_api.get_all_except_user(request.user),
                                   key=lambda data: data['last_modification_date'], reverse=True)
 
         context.update({'other_users_data': other_users_data,

@@ -91,13 +91,12 @@ def _get_forms(form_ids, request_user_is_staff, request_user_id):
     return list_form
 
 
-def _get_data(data_ids, request_user_is_staff, request_user_id):
+def _get_data(data_ids, user):
     """ Get all the data from the list of ids.
 
     Args:
         data_ids:
-        request_user_is_staff:
-        request_user_id:
+        user:
 
     Returns:
         data table
@@ -108,10 +107,10 @@ def _get_data(data_ids, request_user_is_staff, request_user_id):
         for data_id in data_ids:
 
             # Get the data
-            data = data_api.get_by_id(data_id)
+            data = data_api.get_by_id(data_id, user)
 
             # Check the rights
-            _check_rights_document(request_user_is_staff, request_user_id, data.user_id)
+            _check_rights_document(user.is_staff, str(user.id), data.user_id)
 
             data_table.append(data)
     except DoesNotExist:
@@ -208,14 +207,14 @@ def _delete_record(request, data_ids):
     """
 
     try:
-        list_data = _get_data(data_ids, request.user.is_staff, request.user.id)
+        list_data = _get_data(data_ids, request.user)
     except Exception, e:
         messages.add_message(request, messages.INFO, e.message)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
 
     try:
         for data in list_data:
-            data_api.delete(data)
+            data_api.delete(data, request.user)
         messages.add_message(request, messages.INFO, 'Record deleted with success.')
     except:
         messages.add_message(request, messages.INFO, 'A problem occurred while deleting.')
@@ -290,14 +289,14 @@ def _change_owner_record(request, data_ids, user_id):
     Returns:
     """
     try:
-        list_data = _get_data(data_ids, request.user.is_staff, request.user.id)
+        list_data = _get_data(data_ids, request.user)
     except Exception, e:
         messages.add_message(request, messages.INFO, e.message)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
     try:
         new_user = user_api.get_user_by_id(user_id)
         for data in list_data:
-            data_api.change_owner(data, new_user)
+            data_api.change_owner(data, new_user, request.user)
         messages.add_message(request, messages.INFO, 'Owner changed with success.')
     except Exception, e:
         messages.add_message(request, messages.INFO, "Something wrong occurred during the change of owner.")
@@ -314,7 +313,7 @@ def edit_record(request):
     Returns:
     """
     try:
-        data = data_api.get_by_id(request.POST['id'])
+        data = data_api.get_by_id(request.POST['id'], request.user)
     except DoesNotExist:
         return HttpResponseServerError({"It seems a record is missing."}, status=404)
 
