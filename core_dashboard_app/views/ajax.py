@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
 
+import core_main_app.components.user.api as user_api
 import core_main_app.components.data.api as data_api
 from core_dashboard_app import constants
 from core_main_app.commons.exceptions import DoesNotExist
@@ -294,9 +295,9 @@ def _change_owner_record(request, data_ids, user_id):
         messages.add_message(request, messages.INFO, e.message)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
     try:
+        new_user = user_api.get_user_by_id(user_id)
         for data in list_data:
-            data.user_id = user_id
-            data_api.upsert(data)
+            data_api.change_owner(data, new_user)
         messages.add_message(request, messages.INFO, 'Owner changed with success.')
     except Exception, e:
         messages.add_message(request, messages.INFO, "Something wrong occurred during the change of owner.")
