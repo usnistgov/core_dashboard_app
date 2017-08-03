@@ -2,42 +2,53 @@
 
 <table id="table-{{data.document}}-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
     <thead>
-        {% if user.is_staff %}
+        {% if user.is_staff and not data.title %}
             <th> <input type="checkbox" id="select_all_{{group}}" onchange="selectAll(this, '{{group}}')"> </th>
         {% endif %}
         <th>Name</th>
         <th>Last Modification date</th>
-        {% if user.is_staff %}
+        {% if user.is_staff or data.title%}
             <th>User</th>
+        {% endif %}
+        {% if data.is_workspace and not data.title%}
+            <th>Workspace</th>
         {% endif %}
         <th>Actions</th>
     </thead>
     <tbody>
         {% for data_loaded in objects %}
-            {% cycle 'even' '' as rowcolors silent %}
-            <tr class="{{ rowcolors }}" objectid="{{data_loaded.id}}">
-                {% if user.is_staff %}
+            <tr objectid="{{data_loaded.data.id}}">
+                {% if user.is_staff and not data.title %}
                 <td id="actionCheckbox">
-                    <input type="checkbox" id={{data_loaded.id}} name={{group}}>
+                    <input type="checkbox" id={{data_loaded.data.id}} name={{group}}>
                 </td>
                 {% endif %}
                 <td>
-                    {% if data_loaded.content.Resource.identity.title %}
-                        {{ data_loaded.content.Resource.identity.title }}
+                    {% if data_loaded.data.content.Resource.identity.title %}
+                        {{ data_loaded.data.content.Resource.identity.title }}
                     {% else %}
                         <script>
-                            document.write('{{ data_loaded.title }}'.replace(/\.[^/.]+$/, ""));
+                            document.write('{{ data_loaded.data.title }}'.replace(/\.[^/.]+$/, ""));
                         </script>
                     {% endif %}
                 </td>
                 <td>
-                    {{ data_loaded.last_modification_date|date:"Y/m/d, g:i A " }}
+                    {{ data_loaded.data.last_modification_date|date:"Y/m/d, g:i A " }}
                 </td>
-                {% if user.is_staff %}
+                {% if user.is_staff or data.title%}
                 <td>
-                    {% with key=data_loaded.user_id %}
+                    {% with key=data_loaded.data.user_id %}
                       {{ data.usernames|get:key }}
                     {% endwith %}
+                </td>
+                {% endif %}
+                {% if data.is_workspace and not data.title%}
+                <td>
+                    {% if data_loaded.data.workspace %}
+                        {{ data_loaded.data.workspace.title }}
+                    {% else %}
+                        None
+                    {% endif %}
                 </td>
                 {% endif %}
                 <td>
@@ -48,6 +59,13 @@
                     <a class="btn btn-default edit-record-btn">
                         <i class="fa fa-edit"></i> Edit
                     </a>
+
+                    {% if data.is_workspace %}
+                        <a class="btn btn-default assign-workspace-record-btn">
+                            <i class="fa fa-folder"></i> Change workspace
+                        </a>
+                    {% endif %}
+
                     {% if not user.is_staff %}
                         <a class="btn btn-default delete-document-btn">
                             <i class="fa fa-trash"></i> Delete

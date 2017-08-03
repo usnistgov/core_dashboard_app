@@ -4,6 +4,11 @@
 {% block modal_title %}Delete {{data.document}}{% endblock %}
 
 {% block modal_body %}
+<div class="alert alert-danger" id="delete_banner_errors" style="display: none;">
+        <a href="#" class="close" data-hide="alert" aria-label="close">&times;</a>
+     	<h4><i class="fa fa-exclamation-circle"></i> Error</h4>
+        <div id="delete_document_errors"></div>
+</div>
 <input type="hidden" class="{{data.document}}-id"/>
 <p>
     The {{data.document}} will be erased.

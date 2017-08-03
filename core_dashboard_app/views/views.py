@@ -3,6 +3,7 @@
 """
 
 import json
+import copy
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -29,6 +30,11 @@ if 'core_composer_app' in INSTALLED_APPS:
     from core_composer_app.components.type import api as type_api
 if 'core_curate_app' in INSTALLED_APPS:
     import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
+if 'core_workspace_app' in INSTALLED_APPS:
+    import core_workspace_app.components.workspace.api as workspace_api
+    import core_workspace_app.components.data.api as workspace_data_api
+    from core_workspace_app.forms import WorkspaceForm
+    from core_workspace_app import constants as workspace_constants
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
@@ -186,6 +192,63 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
+def dashboard_workspace_records(request, workspace_id):
+    """ List the records of a workspace.
+
+    Args:
+        request:
+    Return:
+    """
+
+    workspace = workspace_api.get_by_id(workspace_id)
+    workspace_data = workspace_data_api.get_all_by_workspace(workspace, request.user)
+    number_columns = 4
+    detailed_user_data = []
+    for data in workspace_data:
+        detailed_user_data.append({'data': data})
+
+    # Add user_form for change owner
+    user_form = UserForm(request.user)
+    context = {
+        'user_data': detailed_user_data,
+        'user_form': user_form,
+        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
+        'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
+        'is_workspace': 'core_workspace_app' in INSTALLED_APPS,
+        'number_columns': number_columns
+    }
+
+    # Get all username and corresponding ids
+    user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
+    context.update({'usernames': user_names})
+    context.update({'title': 'List of records of workspace: ' + workspace.title})
+
+    modals = []
+
+    assets = {
+        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
+
+        "js": copy.deepcopy(dashboard_constants.JS_RECORD)
+    }
+
+    assets['js'].extend([{
+        "path": 'core_main_app/common/js/backtoprevious.js',
+        "is_raw": True
+    }])
+
+    assets['js'].extend(workspace_constants.JS_ASSIGN_WORKSPACE)
+    modals.extend(workspace_constants.MODAL_ASSIGN_WORKSPACE)
+
+    _handle_asset_modals(False, assets, modals, delete=True, change_owner=True, menu=False,
+                         workspace=workspace.title)
+
+    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
+                  context=context,
+                  assets=assets,
+                  modals=modals)
+
+
+@login_required(login_url=reverse_lazy("core_main_app_login"))
 def dashboard_records(request):
     """ List the records.
 
@@ -193,33 +256,44 @@ def dashboard_records(request):
         request:
     Return:
     """
+    number_columns = 3
+    is_workspace = 'core_workspace_app' in INSTALLED_APPS
+    if is_workspace:
+        number_columns += 1
+    if request.user.is_staff:
+        number_columns += 2
 
     # Get user records
     user_data = sorted(data_api.get_all(request.user),
                        key=lambda data: data['last_modification_date'], reverse=True)
 
+    detailed_user_data = []
+    for data in user_data:
+        detailed_user_data.append({'data': data})
+
     # Add user_form for change owner
     user_form = UserForm(request.user)
     context = {
-        'user_data': user_data,
+        'user_data': detailed_user_data,
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
-        'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE
+        'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
+        'is_workspace': 'core_workspace_app' in INSTALLED_APPS,
+        'number_columns': number_columns
     }
 
     # If the user is an admin, we get records for other users
     if request.user.is_staff:
-
         # Get all username and corresponding ids
         user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
-
         # Get all records from other users
         other_users_data = sorted(data_api.get_all_except_user(request.user),
                                   key=lambda data: data['last_modification_date'], reverse=True)
-
-        context.update({'other_users_data': other_users_data,
+        detailed_other_user_data = []
+        for data in other_users_data:
+            detailed_other_user_data.append({'data': data})
+        context.update({'other_users_data': detailed_other_user_data,
                         'usernames': user_names,
-                        'number_columns': 5,
                         'action_form': ActionForm([('1', 'Delete selected records'),
                                                    ('2', 'Change owner of selected records')]),
                         'menu': True})
@@ -227,10 +301,14 @@ def dashboard_records(request):
     modals = []
 
     assets = {
-        "css": dashboard_constants.CSS_COMMON,
+        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
-        "js": dashboard_constants.JS_RECORD
+        "js": copy.deepcopy(dashboard_constants.JS_RECORD)
     }
+
+    if 'core_workspace_app' in INSTALLED_APPS:
+        assets['js'].extend(workspace_constants.JS_ASSIGN_WORKSPACE)
+        modals.extend(workspace_constants.MODAL_ASSIGN_WORKSPACE)
 
     _handle_asset_modals(request.user.is_staff, assets, modals, delete=True, change_owner=True, menu=True)
 
@@ -293,7 +371,7 @@ def dashboard_forms(request):
     modals = []
 
     assets = {
-        "css": dashboard_constants.CSS_COMMON,
+        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
         "js": []
     }
@@ -361,7 +439,7 @@ def dashboard_templates(request):
             ]
 
     assets = {
-        "css": dashboard_constants.CSS_COMMON,
+        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
         "js": [{
                     "path": 'core_main_app/common/js/templates/list/restore.js',
@@ -442,7 +520,7 @@ def dashboard_types(request):
             ]
 
     assets = {
-        "css": dashboard_constants.CSS_COMMON,
+        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
         "js": [{
                     "path": 'core_main_app/common/js/templates/list/restore.js',
@@ -515,7 +593,7 @@ def dashboard_files(request):
     modals = []
 
     assets = {
-        "css": dashboard_constants.CSS_COMMON,
+        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
         "js": []
     }
@@ -531,7 +609,64 @@ def dashboard_files(request):
                   modals=modals)
 
 
-def _handle_asset_modals(user_is_staff, assets, modal, delete=False, change_owner=False, menu=False):
+@login_required(login_url=reverse_lazy("core_main_app_login"))
+def dashboard_workspaces(request):
+    """ List the files.
+
+    Args:
+        request:
+    Return:
+    """
+
+    # Get the workspace the user can read
+    user_workspace_read = list(workspace_api.get_all_workspaces_with_read_access_by_user(request.user))
+    # Get the workspace the user can write
+    user_workspace_write = list(workspace_api.get_all_workspaces_with_write_access_by_user(request.user))
+    # Get the merged list without doublons
+    user_workspaces = user_workspace_read + list(set(user_workspace_write) - set(user_workspace_read))
+    detailed_user_workspaces = []
+    for user_workspace in user_workspaces:
+        detailed_user_workspaces.append({'user': user_api.get_user_by_id(user_workspace.owner).username,
+                                         'is_owner': user_workspace.owner == str(request.user.id),
+                                         'name': user_workspace.title,
+                                         'workspace': user_workspace,
+                                         'can_read': workspace_api.can_user_read_workspace(user_workspace, request.user),
+                                         'can_write': workspace_api.can_user_write_workspace(user_workspace, request.user),
+                                         'is_public': workspace_api.is_workspace_public(user_workspace)
+                                         })
+
+    context = {
+        'workspace_form': WorkspaceForm(),
+        'user_data': detailed_user_workspaces,
+        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.WORKSPACE,
+        'template': dashboard_constants.DASHBOARD_WORKSPACES_TEMPLATE_TABLE,
+        'number_columns': 5,
+        'create_workspace': True
+    }
+
+    modals = workspace_constants.MODAL_CREATE_WORKSPACE
+
+    assets = {
+        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
+
+        "js": copy.deepcopy(workspace_constants.JS_CREATE_WORKSPACE)
+    }
+
+    assets['js'].extend(workspace_constants.JS_PUBLIC_WORKSPACE)
+    modals.extend(workspace_constants.MODAL_PUBLIC_WORKSPACE_FORM)
+
+    _handle_asset_modals(request.user.is_staff, assets, modals,
+                         delete=True,
+                         change_owner=False,
+                         menu=False)
+
+    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
+                  context=context,
+                  assets=assets,
+                  modals=modals)
+
+
+def _handle_asset_modals(user_is_staff, assets, modal, delete=False, change_owner=False, menu=False, workspace=False):
     """ Add needed assets.
 
     Args:
@@ -558,5 +693,7 @@ def _handle_asset_modals(user_is_staff, assets, modal, delete=False, change_owne
         modal.extend(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
 
     # Menu
-    if menu and user_is_staff:
+    if menu and user_is_staff and not workspace:
         assets['js'].extend(dashboard_constants.JS_ADMIN_MENU)
+    else:
+        assets['js'].extend(dashboard_constants.JS_USER_SELECTED_ELEMENT)

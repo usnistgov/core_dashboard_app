@@ -10,6 +10,8 @@ from core_dashboard_app.views.views import UserDashboardPasswordChangeFormView
 
 if 'core_curate_app' in INSTALLED_APPS:
     from core_curate_app.views.user import views as curate_user_views
+if 'core_workspace_app' in INSTALLED_APPS:
+    from core_workspace_app.views import ajax as workspace_ajax
 
 urlpatterns = [
 
@@ -25,11 +27,14 @@ urlpatterns = [
     url(r'^templates$', views.dashboard_templates, name='core_dashboard_templates'),
     url(r'^types$', views.dashboard_types, name='core_dashboard_types'),
     url(r'^files$', views.dashboard_files, name='core_dashboard_files'),
+    url(r'^workspaces$', views.dashboard_workspaces, name='core_dashboard_workspaces'),
+    url(r'^workspace-list-records/(?P<workspace_id>\w+)$', views.dashboard_workspace_records,
+        name='core_dashboard_workspace_list_data'),
 
     url(r'^delete-document', ajax.delete_document, name='core_dashboard_delete_document'),
     url(r'^change-owner', ajax.change_owner_document, name='core_dashboard_change_owner_document'),
     url(r'^edit-record', ajax.edit_record, name='core_dashboard_edit_record'),
     url(r'^view-form/(?P<curate_data_structure_id>\w+)$', curate_user_views.view_form,
-        name='core_dashboard_view_form'),
-
+        name='core_dashboard_view_form') if 'core_curate_app' in INSTALLED_APPS else None,
+    url(r'^create-workspace', workspace_ajax.create_workspace, name='core_dashboard_create_workspace') if 'core_workspace_app' in INSTALLED_APPS else None
 ]

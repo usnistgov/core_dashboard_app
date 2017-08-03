@@ -15,17 +15,4 @@ function initAdminContext() {
 function init() {
     initAdmin();
     initAdminContext();
-    if (menu) {
-        initAdminMenu();
-    }
-}
-
-/**
- * Init the dropdown menu
- */
-function initAdminMenu() {
-    resetCheckbox();
-    $('.paginate_button ').on('click', resetCheckbox);
-    countChecked();
-    $( "input[type=checkbox]" ).on( "change", countChecked );
 }

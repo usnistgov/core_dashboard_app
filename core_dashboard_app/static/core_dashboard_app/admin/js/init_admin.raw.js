@@ -1,1 +1,0 @@
-var menu = '{{data.menu}}' == "True";

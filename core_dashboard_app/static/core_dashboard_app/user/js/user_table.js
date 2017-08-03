@@ -9,7 +9,22 @@ function initUser() {
                 {"className": "dt-center", "targets": 0}
             ],
             order: [[1, 'asc']],
-            "columns": [null, null, {"orderable": false}]
+            "columns": getColumns()
         });
     }
+}
+
+/**
+ * Return the definition of the columns
+ */
+function getColumns() {
+
+    if (numberColumns == "5") {
+        return [ null, null, null, null, { "orderable": false } ];
+    }
+    if (numberColumns == "4") {
+        return [ null, null, null, { "orderable": false } ];
+    }
+    return [null, null, {"orderable": false}]
+
 }

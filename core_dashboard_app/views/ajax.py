@@ -12,9 +12,12 @@ from core_dashboard_app import constants
 from core_main_app.commons.exceptions import DoesNotExist
 from core_main_app.components.blob import api as blob_api
 from core_main_app.settings import INSTALLED_APPS
+from core_main_app.utils.access_control.exceptions import AccessControlError
 if 'core_curate_app' in INSTALLED_APPS:
     from core_curate_app.components.curate_data_structure.models import CurateDataStructure
     import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
+if 'core_workspace_app' in INSTALLED_APPS:
+    from core_workspace_app.components.workspace import api as workspace_api
 
 
 def _check_rights_document(request_user_is_staff, request_user_id, document_user):
@@ -29,6 +32,33 @@ def _check_rights_document(request_user_is_staff, request_user_id, document_user
     """
     if not request_user_is_staff and str(request_user_id) != str(document_user):
         raise Exception("You don't have the rights to perform this action.")
+
+
+def _get_workspaces(workspace_ids, request_user_is_staff, request_user_id):
+    """ Get all the workspaces from the list of ids.
+
+    Args:
+        workspace_ids:
+        request_user_is_staff:
+        request_user_id:
+
+    Returns:
+        list form
+    """
+
+    list_workspaces = []
+    try:
+        for workspace_id in workspace_ids:
+            # Get the workspace
+            workspace = workspace_api.get_by_id(workspace_id)
+
+            list_workspaces.append(workspace)
+    except DoesNotExist:
+        raise Exception('It seems a workspace is missing. Please refresh the page.')
+    except Exception, e:
+        raise Exception(e.message)
+
+    return list_workspaces
 
 
 def _get_blobs(blob_ids, request_user_is_staff, request_user_id):
@@ -142,8 +172,34 @@ def delete_document(request):
         return _delete_form(request, document_ids)
     elif document == constants.FUNCTIONAL_OBJECT_ENUM.FILE:
         return _delete_file(request, document_ids)
+    elif document == constants.FUNCTIONAL_OBJECT_ENUM.WORKSPACE:
+        return _delete_workspace(request, document_ids)
 
     return HttpResponseBadRequest({"Bad entries. Please check the parameters."})
+
+
+def _delete_workspace(request, workspace_ids):
+    """ Delete workspace.
+
+        Args:
+            request:
+            workspace_ids:
+
+        Returns:
+        """
+    try:
+        list_workspaces = _get_workspaces(workspace_ids, request.user.is_staff, request.user.id)
+    except Exception, e:
+        messages.add_message(request, messages.INFO, e.message)
+        return HttpResponse(json.dumps({}), content_type='application/javascript')
+
+    try:
+        for workspace in list_workspaces:
+            workspace_api.delete(workspace, request.user)
+    except AccessControlError, ace:
+        return HttpResponseBadRequest(ace.message)
+
+    return HttpResponse(json.dumps({}), content_type='application/javascript')
 
 
 def _delete_file(request, blob_ids):
@@ -164,7 +220,7 @@ def _delete_file(request, blob_ids):
     try:
         for blob in list_blob:
             blob_api.delete(blob)
-        messages.add_message(request, messages.INFO, 'Form deleted with success.')
+        messages.add_message(request, messages.INFO, 'File deleted with success.')
     except:
         messages.add_message(request, messages.INFO, 'A problem occurred while deleting.')
 

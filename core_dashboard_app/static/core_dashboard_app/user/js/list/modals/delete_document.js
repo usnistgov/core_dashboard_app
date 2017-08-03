@@ -5,6 +5,7 @@
 openDeleteDocument = function () {
     var $recordRow = $(this).parent().parent();
     $('.'+functional_object+'-id').val($recordRow.attr("objectid"));
+    $("#delete_banner_errors").hide();
     $("#delete-result-modal").modal("show");
 };
 
@@ -23,7 +24,11 @@ delete_document = function(){
         },
 		success: function(data){
 		        location.reload(true);
-	    }
+	    },
+        error:function(data){
+            $("#delete_document_errors").html(data.responseText);
+            $("#delete_banner_errors").show(500)
+        }
     });
 };
 

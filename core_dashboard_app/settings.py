@@ -20,6 +20,8 @@ if 'core_composer_app' in INSTALLED_APPS:
     menu['My Types'] = 'core_dashboard_types'
 if 'core_curate_app' in INSTALLED_APPS:
     menu['My Forms'] = 'core_dashboard_forms'
+if 'core_workspace_app' in INSTALLED_APPS:
+    menu['My Workspaces'] = 'core_dashboard_workspaces'
 
 # Menu
 DASHBOARD_MENU = getattr(settings, 'DASHBOARD_MENU', menu)

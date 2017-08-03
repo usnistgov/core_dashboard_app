@@ -15,4 +15,7 @@ $(document).ready(function(){
     }
 
     init();
+    if (menu === true) {
+        initMenu();
+    }
 });

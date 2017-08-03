@@ -39,6 +39,9 @@ function getColumns() {
     if (numberColumns == "5") {
         return [ { "orderable": false }, null, null, null, { "orderable": false } ];
     }
+    else if (numberColumns == "6") {
+        return [ { "orderable": false }, null, null, null, null, { "orderable": false } ];
+    }
     return [ null, null, null, { "orderable": false } ]
 
 }

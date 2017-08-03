@@ -16,6 +16,7 @@ DASHBOARD_FORMS_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_forms_
 DASHBOARD_TEMPLATES_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_templates_table.html'
 DASHBOARD_TYPES_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_types_table.html'
 DASHBOARD_FILES_TEMPLATE_TABLE='core_dashboard_app/list/my_dashboard_my_files_table.html'
+DASHBOARD_WORKSPACES_TEMPLATE_TABLE='core_dashboard_app/list/my_dashboard_my_workspaces_table.html'
 
 # Assets
 MODALS_COMMON_DELETE = [
@@ -38,11 +39,12 @@ JS_USER = [{
            {
                 "path": 'core_dashboard_app/user/js/user_table.js',
                 "is_raw": False
-           },
-           {
-                "path": 'core_dashboard_app/user/js/get_selected_document.js',
-                "is_raw": True
            }]
+
+JS_USER_SELECTED_ELEMENT = [{
+                                "path": 'core_dashboard_app/user/js/get_selected_document.js',
+                                "is_raw": True
+                           }]
 
 JS_COMMON = [{
                 "path": 'core_main_app/libs/datatables/1.10.13/js/jquery.dataTables.js',
@@ -64,11 +66,19 @@ JS_ADMIN_MENU = [{
                 {
                     "path": 'core_dashboard_app/admin/js/select_all.js',
                     "is_raw": True
+                },
+                {
+                    "path": 'core_dashboard_app/admin/js/get_selected_document_admin.js',
+                    "is_raw": False
+                },
+                {
+                    "path": 'core_dashboard_app/admin/js/init_admin_menu.js',
+                    "is_raw": False
                 }]
 
 JS_ADMIN = [{
                 "path": 'core_dashboard_app/admin/js/init_admin.js',
-                "is_raw": False
+                "is_raw": True
             },
             {
                 "path": 'core_dashboard_app/admin/js/action_dashboard.js',
@@ -77,11 +87,8 @@ JS_ADMIN = [{
             {
                 "path": 'core_dashboard_app/admin/js/admin_table.js',
                 "is_raw": False
-            },
-            {
-                "path": 'core_dashboard_app/admin/js/get_selected_document_admin.js',
-                "is_raw": False
             }]
+
 
 JS_COMMON_FUNCTION_DELETE = [{
                                 "path": 'core_dashboard_app/user/js/list/modals/delete_document.js',
@@ -107,4 +114,5 @@ FUNCTIONAL_OBJECT_ENUM = enum(RECORD='record',
                               FORM='form',
                               TEMPLATE='template',
                               TYPE='type',
-                              FILE='file')
+                              FILE='file',
+                              WORKSPACE='workspace')
