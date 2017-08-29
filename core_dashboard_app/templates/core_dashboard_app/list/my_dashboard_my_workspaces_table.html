@@ -22,7 +22,8 @@
                     </a>
 
                     {% if object.is_owner %}
-                        <a class="btn btn-default rights-document-btn">
+                        <a class="btn btn-default rights-document-btn"
+                            href="{% url 'core_workspace_edit_rights_workspace' object.workspace.id %}">
                             <i class="fa fa-edit"></i> Edit
                         </a>
 
