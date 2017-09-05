@@ -13,6 +13,7 @@ from django.http.response import HttpResponseRedirect
 from django.utils import timezone
 from password_policies.views import PasswordChangeFormView
 
+from core_main_app.utils.access_control.exceptions import AccessControlError
 import core_main_app.components.version_manager.api as version_manager_api
 from core_dashboard_app import constants as dashboard_constants
 from core_dashboard_app.views.forms import ActionForm, UserForm
@@ -199,13 +200,24 @@ def dashboard_workspace_records(request, workspace_id):
         request:
     Return:
     """
-
+    is_workspace = 'core_workspace_app' in INSTALLED_APPS
     workspace = workspace_api.get_by_id(workspace_id)
-    workspace_data = workspace_data_api.get_all_by_workspace(workspace, request.user)
+
+    try:
+        workspace_data = workspace_data_api.get_all_by_workspace(workspace, request.user)
+    except AccessControlError, ace:
+        workspace_data = []
+
     number_columns = 4
     detailed_user_data = []
     for data in workspace_data:
-        detailed_user_data.append({'data': data})
+        detailed_user_data.append({'data': data,
+                                   'can_read': not is_workspace or
+                                               (is_workspace and workspace_api.can_user_read_workspace(workspace, request.user)),
+                                   'can_write': not is_workspace or
+                                               (is_workspace and workspace_api.can_user_write_workspace(workspace, request.user)),
+                                   'is_owner': str(data.user_id) == str(request.user.id) or request.user.is_superuser
+                                   })
 
     # Add user_form for change owner
     user_form = UserForm(request.user)
@@ -214,7 +226,7 @@ def dashboard_workspace_records(request, workspace_id):
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
         'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
-        'is_workspace': 'core_workspace_app' in INSTALLED_APPS,
+        'is_workspace': is_workspace,
         'number_columns': number_columns
     }
 
@@ -260,7 +272,7 @@ def dashboard_records(request):
     is_workspace = 'core_workspace_app' in INSTALLED_APPS
     if is_workspace:
         number_columns += 1
-    if request.user.is_staff:
+    if request.user.is_superuser:
         number_columns += 2
 
     # Get user records
@@ -269,7 +281,11 @@ def dashboard_records(request):
 
     detailed_user_data = []
     for data in user_data:
-        detailed_user_data.append({'data': data})
+        detailed_user_data.append({'data': data,
+                                   'can_read': True,
+                                   'can_write': True,
+                                   'is_owner': True
+                                   })
 
     # Add user_form for change owner
     user_form = UserForm(request.user)
@@ -283,7 +299,7 @@ def dashboard_records(request):
     }
 
     # If the user is an admin, we get records for other users
-    if request.user.is_staff:
+    if request.user.is_superuser:
         # Get all username and corresponding ids
         user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
         # Get all records from other users
@@ -291,7 +307,10 @@ def dashboard_records(request):
                                   key=lambda data: data['last_modification_date'], reverse=True)
         detailed_other_user_data = []
         for data in other_users_data:
-            detailed_other_user_data.append({'data': data})
+            detailed_other_user_data.append({'data': data,
+                                             'can_read': True,
+                                             'can_write': True,
+                                             'is_owner': True})
         context.update({'other_users_data': detailed_other_user_data,
                         'usernames': user_names,
                         'action_form': ActionForm([('1', 'Delete selected records'),

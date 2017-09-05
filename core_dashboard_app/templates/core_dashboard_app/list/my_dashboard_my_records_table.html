@@ -52,21 +52,21 @@
                 </td>
                 {% endif %}
                 <td>
-                    <a class="btn btn-default view-record-btn">
-                        <i class="fa fa-file-text-o"></i> View
-                    </a>
+                    {% if data_loaded.can_read %}
+                        <a class="btn btn-default view-record-btn">
+                            <i class="fa fa-file-text-o"></i> View
+                        </a>
+                    {% endif %}
+                    {% if data_loaded.can_write %}
+                        <a class="btn btn-default edit-record-btn">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
 
-                    <a class="btn btn-default edit-record-btn">
-                        <i class="fa fa-edit"></i> Edit
-                    </a>
-
-                    {% if data.is_workspace %}
                         <a class="btn btn-default assign-workspace-record-btn">
                             <i class="fa fa-folder"></i> Change workspace
                         </a>
                     {% endif %}
-
-                    {% if not user.is_staff %}
+                    {% if data_loaded.is_owner %}
                         <a class="btn btn-default delete-document-btn">
                             <i class="fa fa-trash"></i> Delete
                         </a>
