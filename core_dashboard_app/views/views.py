@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import IntegrityError
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, HttpResponseBadRequest
 from django.utils import timezone
 from password_policies.views import PasswordChangeFormView
 
@@ -201,6 +201,9 @@ def dashboard_workspace_records(request, workspace_id):
     Return:
     """
     is_workspace = 'core_workspace_app' in INSTALLED_APPS
+    if not is_workspace:
+        return HttpResponseBadRequest("Workspaces are not installed.")
+
     workspace = workspace_api.get_by_id(workspace_id)
 
     try:
@@ -210,12 +213,12 @@ def dashboard_workspace_records(request, workspace_id):
 
     number_columns = 4
     detailed_user_data = []
+    user_can_read = workspace_api.can_user_read_workspace(workspace, request.user)
+    user_can_write = workspace_api.can_user_write_workspace(workspace, request.user)
     for data in workspace_data:
         detailed_user_data.append({'data': data,
-                                   'can_read': not is_workspace or
-                                               (is_workspace and workspace_api.can_user_read_workspace(workspace, request.user)),
-                                   'can_write': not is_workspace or
-                                               (is_workspace and workspace_api.can_user_write_workspace(workspace, request.user)),
+                                   'can_read': user_can_read,
+                                   'can_write': user_can_write,
                                    'is_owner': str(data.user_id) == str(request.user.id) or request.user.is_superuser
                                    })
 
@@ -649,8 +652,8 @@ def dashboard_workspaces(request):
                                          'is_owner': user_workspace.owner == str(request.user.id),
                                          'name': user_workspace.title,
                                          'workspace': user_workspace,
-                                         'can_read': workspace_api.can_user_read_workspace(user_workspace, request.user),
-                                         'can_write': workspace_api.can_user_write_workspace(user_workspace, request.user),
+                                         'can_read': user_workspace in user_workspace_read,
+                                         'can_write': user_workspace in user_workspace_write,
                                          'is_public': workspace_api.is_workspace_public(user_workspace)
                                          })
 
