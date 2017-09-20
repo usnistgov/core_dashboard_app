@@ -2,12 +2,12 @@
 
 <table id="table-{{data.document}}-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
     <thead>
-        {% if user.is_staff and not data.title %}
+        {% if user.is_superuser and not data.title %}
             <th> <input type="checkbox" id="select_all_{{group}}" onchange="selectAll(this, '{{group}}')"> </th>
         {% endif %}
         <th>Name</th>
         <th>Last Modification date</th>
-        {% if user.is_staff or data.title%}
+        {% if user.is_superuser or data.title%}
             <th>User</th>
         {% endif %}
         {% if data.is_workspace and not data.title%}
@@ -18,7 +18,7 @@
     <tbody>
         {% for data_loaded in objects %}
             <tr objectid="{{data_loaded.data.id}}">
-                {% if user.is_staff and not data.title %}
+                {% if user.is_superuser and not data.title %}
                 <td id="actionCheckbox">
                     <input type="checkbox" id={{data_loaded.data.id}} name={{group}}>
                 </td>
@@ -35,7 +35,7 @@
                 <td>
                     {{ data_loaded.data.last_modification_date|date:"Y/m/d, g:i A " }}
                 </td>
-                {% if user.is_staff or data.title%}
+                {% if user.is_superuser or data.title%}
                 <td>
                     {% with key=data_loaded.data.user_id %}
                       {{ data.usernames|get:key }}

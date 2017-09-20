@@ -2,12 +2,12 @@
 
 <table id="table-{{data.document}}-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
     <thead>
-        {% if user.is_staff %}
+        {% if user.is_superuser %}
             <th> <input type="checkbox" id="select_all_{{group}}" onchange="selectAll(this, '{{group}}')"> </th>
         {% endif %}
         <th>Name</th>
         <th>Template</th>
-        {% if user.is_staff %}
+        {% if user.is_superuser %}
             <th>User</th>
         {% endif %}
         <th>Actions</th>
@@ -16,7 +16,7 @@
         {% for data_loaded in objects %}
             {% cycle 'even' '' as rowcolors silent %}
             <tr class="{{ rowcolors }}" objectid="{{data_loaded.form.id}}">
-                {% if user.is_staff %}
+                {% if user.is_superuser %}
                 <td id="actionCheckbox">
                     <input type="checkbox" id={{data_loaded.form.id}} name={{group}}>
                 </td>
@@ -27,7 +27,7 @@
                 <td>
                     {{ data_loaded.template }}
                 </td>
-                {% if user.is_staff %}
+                {% if user.is_superuser %}
                 <td>
                     {% with key=data_loaded.form.user %}
                       {{ data.usernames|get:key }}
@@ -43,7 +43,7 @@
                     <a class="btn btn-default edit-form-btn" href="{% url 'core_curate_enter_data' data_loaded.form.id %}">
                         <i class="fa fa-edit"></i> Edit
                     </a>
-                    {% if not user.is_staff %}
+                    {% if not user.is_superuser %}
                         <a class="btn btn-default delete-document-btn">
                             <i class="fa fa-trash"></i> Delete
                         </a>

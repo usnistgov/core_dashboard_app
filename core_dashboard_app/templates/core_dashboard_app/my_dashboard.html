@@ -4,7 +4,7 @@
 {% if data.title %}
     <h1><span>{{data.title}}</span></h1>
 {% else %}
-    <h1><span>{% if user.is_staff %}All {%else%}My {% endif %}{{data.document}}s</span></h1>
+    <h1><span>{% if user.is_superuser %}All {%else%}My {% endif %}{{data.document}}s</span></h1>
 {% endif %}
 {% endblock %}
 
@@ -26,7 +26,7 @@
 
 {% block box_body %}
 
-    {% if user.is_staff and data.menu and not data.title %}
+    {% if user.is_superuser and data.menu and not data.title %}
         <ul  class="nav nav-tabs">
             <li class="active"> <a href="#admin" data-toggle="tab" onclick="resetCheckbox();" style="text-decoration:none;">Mine</a> </li>
             <li><a href="#others" data-toggle="tab" onclick="resetCheckbox();" style="text-decoration:none;">Others</a> </li>
@@ -45,7 +45,7 @@
     {% endif %}
 
     <div class="tab-content">
-        {% if user.is_staff and not data.title %}
+        {% if user.is_superuser and not data.title %}
           <div class="tab-pane active" id="admin" style="width:98%">
             {% if data.user_data %}
                 {% include data.template with objects=data.user_data group='admin' %}

@@ -2,12 +2,12 @@
 
 <table id="table-{{data.document}}-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
     <thead>
-        {% if user.is_staff %}
+        {% if user.is_superuser %}
             <th> <input type="checkbox" id="select_all_{{group}}" onchange="selectAll(this, '{{group}}')"> </th>
         {% endif %}
         <th>File name</th>
         <th>Upload date</th>
-        {% if user.is_staff %}
+        {% if user.is_superuser %}
             <th>User</th>
         {% endif %}
         <th>Actions</th>
@@ -15,14 +15,14 @@
     <tbody>
         {% for object in objects %}
             <tr class="{{ rowcolors }}" objectid="{{object.file.id}}">
-                {% if user.is_staff %}
+                {% if user.is_superuser %}
                 <td id="actionCheckbox">
                     <input type="checkbox" id={{object.file.id}} name={{group}}>
                 </td>
                 {% endif %}
                 <td>{{ object.file.filename }}</td>
                 <td>{{ object.date }}</td>
-                {% if user.is_staff %}
+                {% if user.is_superuser %}
                     <td>
                         {{object.user}}
                     </td>

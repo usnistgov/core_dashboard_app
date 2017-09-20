@@ -332,7 +332,7 @@ def dashboard_records(request):
         assets['js'].extend(workspace_constants.JS_ASSIGN_WORKSPACE)
         modals.extend(workspace_constants.MODAL_ASSIGN_WORKSPACE)
 
-    _handle_asset_modals(request.user.is_staff, assets, modals, delete=True, change_owner=True, menu=True)
+    _handle_asset_modals(request.user.is_superuser, assets, modals, delete=True, change_owner=True, menu=True)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
@@ -369,7 +369,7 @@ def dashboard_forms(request):
                }
 
     # If the user is an admin, we get records for other users
-    if request.user.is_staff:
+    if request.user.is_superuser:
 
         # Get all username and corresponding ids
         user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
@@ -398,7 +398,7 @@ def dashboard_forms(request):
         "js": []
     }
 
-    _handle_asset_modals(request.user.is_staff, assets, modals, delete=True, change_owner=True, menu=True)
+    _handle_asset_modals(request.user.is_superuser, assets, modals, delete=True, change_owner=True, menu=True)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
@@ -437,7 +437,7 @@ def dashboard_templates(request):
         'template': dashboard_constants.DASHBOARD_TEMPLATES_TEMPLATE_TABLE
     }
     # If the user is an admin, we get records for other users
-    if request.user.is_staff:
+    if request.user.is_superuser:
 
         # Get all templates from other users
         other_template_versions = template_version_manager_api.get_all_version_manager_except_user_id(request.user.id)
@@ -477,7 +477,7 @@ def dashboard_templates(request):
                 }]
     }
 
-    _handle_asset_modals(request.user.is_staff, assets, modals,
+    _handle_asset_modals(request.user.is_superuser, assets, modals,
                          delete=False,
                          change_owner=False,
                          menu=True)
@@ -516,7 +516,7 @@ def dashboard_types(request):
         'template': dashboard_constants.DASHBOARD_TYPES_TEMPLATE_TABLE
     }
     # If the user is an admin, we get records for other users
-    if request.user.is_staff:
+    if request.user.is_superuser:
 
         # Get all types from other users
         other_type_versions = type_version_manager_api.get_all_version_manager_except_user_id(request.user.id)
@@ -558,7 +558,7 @@ def dashboard_types(request):
                 }]
     }
 
-    _handle_asset_modals(request.user.is_staff, assets, modals,
+    _handle_asset_modals(request.user.is_superuser, assets, modals,
                          delete=False,
                          change_owner=False,
                          menu=True)
@@ -593,7 +593,7 @@ def dashboard_files(request):
     }
 
     # If the user is an admin, we get files of other users
-    if request.user.is_staff:
+    if request.user.is_superuser:
 
         # Get all files from other users
         other_files = blob_api.get_all_except_user_id(request.user.id)
@@ -620,7 +620,7 @@ def dashboard_files(request):
         "js": []
     }
 
-    _handle_asset_modals(request.user.is_staff, assets, modals,
+    _handle_asset_modals(request.user.is_superuser, assets, modals,
                          delete=True,
                          change_owner=False,
                          menu=True)
@@ -677,7 +677,7 @@ def dashboard_workspaces(request):
     assets['js'].extend(workspace_constants.JS_PUBLIC_WORKSPACE)
     modals.extend(workspace_constants.MODAL_PUBLIC_WORKSPACE_FORM)
 
-    _handle_asset_modals(request.user.is_staff, assets, modals,
+    _handle_asset_modals(request.user.is_superuser, assets, modals,
                          delete=True,
                          change_owner=False,
                          menu=False)
@@ -688,11 +688,11 @@ def dashboard_workspaces(request):
                   modals=modals)
 
 
-def _handle_asset_modals(user_is_staff, assets, modal, delete=False, change_owner=False, menu=False, workspace=False):
+def _handle_asset_modals(user_is_superuser, assets, modal, delete=False, change_owner=False, menu=False, workspace=False):
     """ Add needed assets.
 
     Args:
-        user_is_staff
+        user_is_superuser
         assets
         modal
         delete
@@ -703,7 +703,7 @@ def _handle_asset_modals(user_is_staff, assets, modal, delete=False, change_owne
     """
 
     # Admin or user assets
-    assets['js'].extend(dashboard_constants.JS_ADMIN if user_is_staff else dashboard_constants.JS_USER)
+    assets['js'].extend(dashboard_constants.JS_ADMIN if user_is_superuser else dashboard_constants.JS_USER)
 
     # Common asset
     assets['js'].extend(dashboard_constants.JS_COMMON)
@@ -715,7 +715,7 @@ def _handle_asset_modals(user_is_staff, assets, modal, delete=False, change_owne
         modal.extend(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
 
     # Menu
-    if menu and user_is_staff and not workspace:
+    if menu and user_is_superuser and not workspace:
         assets['js'].extend(dashboard_constants.JS_ADMIN_MENU)
     else:
         assets['js'].extend(dashboard_constants.JS_USER_SELECTED_ELEMENT)

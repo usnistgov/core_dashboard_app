@@ -20,26 +20,26 @@ if 'core_workspace_app' in INSTALLED_APPS:
     from core_workspace_app.components.workspace import api as workspace_api
 
 
-def _check_rights_document(request_user_is_staff, request_user_id, document_user):
-    """ Check if the user is staff or if the document belongs to the user.
+def _check_rights_document(request_user_is_superuser, request_user_id, document_user):
+    """ Check if the user is superuser or if the document belongs to the user.
 
     Args:
-        request_user_is_staff:
+        request_user_is_superuser:
         request_user_id:
         document_user:
 
     Returns:
     """
-    if not request_user_is_staff and str(request_user_id) != str(document_user):
+    if not request_user_is_superuser and str(request_user_id) != str(document_user):
         raise Exception("You don't have the rights to perform this action.")
 
 
-def _get_workspaces(workspace_ids, request_user_is_staff, request_user_id):
+def _get_workspaces(workspace_ids, request_user_is_superuser, request_user_id):
     """ Get all the workspaces from the list of ids.
 
     Args:
         workspace_ids:
-        request_user_is_staff:
+        request_user_is_superuser:
         request_user_id:
 
     Returns:
@@ -61,12 +61,12 @@ def _get_workspaces(workspace_ids, request_user_is_staff, request_user_id):
     return list_workspaces
 
 
-def _get_blobs(blob_ids, request_user_is_staff, request_user_id):
+def _get_blobs(blob_ids, request_user_is_superuser, request_user_id):
     """ Get all the blobs from the list of ids.
 
     Args:
         blob_ids:
-        request_user_is_staff:
+        request_user_is_superuser:
         request_user_id:
 
     Returns:
@@ -80,7 +80,7 @@ def _get_blobs(blob_ids, request_user_is_staff, request_user_id):
             blob = blob_api.get_by_id(blob_id)
 
             # Check the rights
-            _check_rights_document(request_user_is_staff, request_user_id, blob.user_id)
+            _check_rights_document(request_user_is_superuser, request_user_id, blob.user_id)
 
             list_blobs.append(blob)
     except DoesNotExist:
@@ -91,12 +91,12 @@ def _get_blobs(blob_ids, request_user_is_staff, request_user_id):
     return list_blobs
 
 
-def _get_forms(form_ids, request_user_is_staff, request_user_id):
+def _get_forms(form_ids, request_user_is_superuser, request_user_id):
     """ Get all the forms from the list of ids.
 
     Args:
         form_ids:
-        request_user_is_staff:
+        request_user_is_superuser:
         request_user_id:
 
     Returns:
@@ -110,7 +110,7 @@ def _get_forms(form_ids, request_user_is_staff, request_user_id):
             form = curate_data_structure_api.get_by_id(form_id)
 
             # Check the rights
-            _check_rights_document(request_user_is_staff, request_user_id, form.user)
+            _check_rights_document(request_user_is_superuser, request_user_id, form.user)
 
             list_form.append(form)
     except DoesNotExist:
@@ -140,7 +140,7 @@ def _get_data(data_ids, user):
             data = data_api.get_by_id(data_id, user)
 
             # Check the rights
-            _check_rights_document(user.is_staff, str(user.id), data.user_id)
+            _check_rights_document(user.is_superuser, str(user.id), data.user_id)
 
             data_table.append(data)
     except DoesNotExist:
@@ -163,7 +163,7 @@ def delete_document(request):
     document = request.POST['functional_object']
 
     document_ids = request.POST.getlist('document_id[]', [])
-    if len(document_ids) > 1 and not request.user.is_staff:
+    if len(document_ids) > 1 and not request.user.is_superuser:
         return HttpResponseServerError({"You don't have the rights to perform this action."}, status=403)
 
     if document == constants.FUNCTIONAL_OBJECT_ENUM.RECORD:
@@ -188,7 +188,7 @@ def _delete_workspace(request, workspace_ids):
         Returns:
         """
     try:
-        list_workspaces = _get_workspaces(workspace_ids, request.user.is_staff, request.user.id)
+        list_workspaces = _get_workspaces(workspace_ids, request.user.is_superuser, request.user.id)
     except Exception, e:
         messages.add_message(request, messages.INFO, e.message)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
@@ -212,7 +212,7 @@ def _delete_file(request, blob_ids):
         Returns:
         """
     try:
-        list_blob = _get_blobs(blob_ids, request.user.is_staff, request.user.id)
+        list_blob = _get_blobs(blob_ids, request.user.is_superuser, request.user.id)
     except Exception, e:
         messages.add_message(request, messages.INFO, e.message)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
@@ -237,7 +237,7 @@ def _delete_form(request, form_ids):
         Returns:
         """
     try:
-        list_form = _get_forms(form_ids, request.user.is_staff, request.user.id)
+        list_form = _get_forms(form_ids, request.user.is_superuser, request.user.id)
     except Exception, e:
         messages.add_message(request, messages.INFO, e.message)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
@@ -292,7 +292,7 @@ def change_owner_document(request):
         user_id = request.POST['user_id']
 
         document_ids = request.POST.getlist('document_id[]', [])
-        if len(document_ids) > 1 and not request.user.is_staff:
+        if len(document_ids) > 1 and not request.user.is_superuser:
             return HttpResponseServerError({"You don't have the rights to perform this action."}, status=403)
 
         if document == constants.FUNCTIONAL_OBJECT_ENUM.RECORD:
@@ -317,7 +317,7 @@ def _change_owner_form(request, form_ids, user_id):
     Returns:
     """
     try:
-        list_form = _get_forms(form_ids, request.user.is_staff, request.user.id)
+        list_form = _get_forms(form_ids, request.user.is_superuser, request.user.id)
     except Exception, e:
         messages.add_message(request, messages.INFO, e.message)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
