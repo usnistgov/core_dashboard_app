@@ -10,7 +10,7 @@
         {% if user.is_superuser or data.title%}
             <th>User</th>
         {% endif %}
-        {% if data.is_workspace and not data.title%}
+        {% if not data.title%}
             <th>Workspace</th>
         {% endif %}
         <th>Actions</th>
@@ -42,7 +42,7 @@
                     {% endwith %}
                 </td>
                 {% endif %}
-                {% if data.is_workspace and not data.title%}
+                {% if not data.title%}
                 <td>
                     {% if data_loaded.data.workspace %}
                         {{ data_loaded.data.workspace.title }}

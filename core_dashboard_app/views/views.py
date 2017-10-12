@@ -2,19 +2,20 @@
     Views available for the user
 """
 
-import json
 import copy
+import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import IntegrityError
-from django.http.response import HttpResponseRedirect, HttpResponseBadRequest
+from django.http.response import HttpResponseRedirect
 from django.utils import timezone
 from password_policies.views import PasswordChangeFormView
 
-from core_main_app.utils.access_control.exceptions import AccessControlError
+import core_main_app.components.data.api as workspace_data_api
 import core_main_app.components.version_manager.api as version_manager_api
+import core_main_app.components.workspace.api as workspace_api
 from core_dashboard_app import constants as dashboard_constants
 from core_dashboard_app.views.forms import ActionForm, UserForm
 from core_main_app.components.blob import api as blob_api, utils as blob_utils
@@ -23,19 +24,16 @@ from core_main_app.components.template import api as template_api
 from core_main_app.components.template_version_manager import api as template_version_manager_api
 from core_main_app.components.user import api as user_api
 from core_main_app.settings import INSTALLED_APPS
+from core_main_app.utils.access_control.exceptions import AccessControlError
 from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
 from core_main_app.utils.rendering import render
 from core_main_app.views.admin.forms import EditProfileForm
+from core_main_app.views.user.forms import WorkspaceForm
 if 'core_composer_app' in INSTALLED_APPS:
     from core_composer_app.components.type_version_manager import api as type_version_manager_api
     from core_composer_app.components.type import api as type_api
 if 'core_curate_app' in INSTALLED_APPS:
     import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
-if 'core_workspace_app' in INSTALLED_APPS:
-    import core_workspace_app.components.workspace.api as workspace_api
-    import core_workspace_app.components.data.api as workspace_data_api
-    from core_workspace_app.forms import WorkspaceForm
-    from core_workspace_app import constants as workspace_constants
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
@@ -200,10 +198,6 @@ def dashboard_workspace_records(request, workspace_id):
         request:
     Return:
     """
-    is_workspace = 'core_workspace_app' in INSTALLED_APPS
-    if not is_workspace:
-        return HttpResponseBadRequest("Workspaces are not installed.")
-
     workspace = workspace_api.get_by_id(workspace_id)
 
     try:
@@ -229,7 +223,6 @@ def dashboard_workspace_records(request, workspace_id):
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
         'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
-        'is_workspace': is_workspace,
         'number_columns': number_columns
     }
 
@@ -238,12 +231,15 @@ def dashboard_workspace_records(request, workspace_id):
     context.update({'usernames': user_names})
     context.update({'title': 'List of records of workspace: ' + workspace.title})
 
-    modals = []
+    modals = ["core_main_app/user/workspaces/list/modals/assign_workspace.html"]
 
     assets = {
         "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
-        "js": copy.deepcopy(dashboard_constants.JS_RECORD)
+        "js": [{
+                    "path": 'core_main_app/user/js/workspaces/list/modals/assign_workspace.js',
+                    "is_raw": False
+               }]
     }
 
     assets['js'].extend([{
@@ -251,8 +247,7 @@ def dashboard_workspace_records(request, workspace_id):
         "is_raw": True
     }])
 
-    assets['js'].extend(workspace_constants.JS_ASSIGN_WORKSPACE)
-    modals.extend(workspace_constants.MODAL_ASSIGN_WORKSPACE)
+    assets['js'].extend(copy.deepcopy(dashboard_constants.JS_RECORD))
 
     _handle_asset_modals(False, assets, modals, delete=True, change_owner=True, menu=False,
                          workspace=workspace.title)
@@ -271,10 +266,7 @@ def dashboard_records(request):
         request:
     Return:
     """
-    number_columns = 3
-    is_workspace = 'core_workspace_app' in INSTALLED_APPS
-    if is_workspace:
-        number_columns += 1
+    number_columns = 4
     if request.user.is_superuser:
         number_columns += 2
 
@@ -297,7 +289,6 @@ def dashboard_records(request):
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
         'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
-        'is_workspace': 'core_workspace_app' in INSTALLED_APPS,
         'number_columns': number_columns
     }
 
@@ -320,17 +311,18 @@ def dashboard_records(request):
                                                    ('2', 'Change owner of selected records')]),
                         'menu': True})
 
-    modals = []
+    modals = ["core_main_app/user/workspaces/list/modals/assign_workspace.html"]
 
     assets = {
         "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
-        "js": copy.deepcopy(dashboard_constants.JS_RECORD)
+        "js": [{
+                    "path": 'core_main_app/user/js/workspaces/list/modals/assign_workspace.js',
+                    "is_raw": False
+               }]
     }
 
-    if 'core_workspace_app' in INSTALLED_APPS:
-        assets['js'].extend(workspace_constants.JS_ASSIGN_WORKSPACE)
-        modals.extend(workspace_constants.MODAL_ASSIGN_WORKSPACE)
+    assets['js'].extend(copy.deepcopy(dashboard_constants.JS_RECORD))
 
     _handle_asset_modals(request.user.is_superuser, assets, modals, delete=True, change_owner=True, menu=True)
 
@@ -666,16 +658,22 @@ def dashboard_workspaces(request):
         'create_workspace': True
     }
 
-    modals = workspace_constants.MODAL_CREATE_WORKSPACE
+    modals = ["core_main_app/user/workspaces/list/create_workspace.html",
+              "core_main_app/user/workspaces/list/modals/set_public.html"]
 
     assets = {
         "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
-        "js": copy.deepcopy(workspace_constants.JS_CREATE_WORKSPACE)
+        "js": [{
+                    "path": 'core_main_app/user/js/workspaces/create_workspace.js',
+                    "is_raw": False
+               },
+               {
+                    "path": 'core_main_app/user/js/workspaces/list/modals/set_public.js',
+                    "is_raw": False
+               }
+        ]
     }
-
-    assets['js'].extend(workspace_constants.JS_PUBLIC_WORKSPACE)
-    modals.extend(workspace_constants.MODAL_PUBLIC_WORKSPACE_FORM)
 
     _handle_asset_modals(request.user.is_superuser, assets, modals,
                          delete=True,

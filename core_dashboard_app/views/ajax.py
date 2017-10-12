@@ -6,18 +6,17 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
 
-import core_main_app.components.user.api as user_api
 import core_main_app.components.data.api as data_api
+import core_main_app.components.user.api as user_api
 from core_dashboard_app import constants
 from core_main_app.commons.exceptions import DoesNotExist
 from core_main_app.components.blob import api as blob_api
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.utils.access_control.exceptions import AccessControlError
+from core_main_app.components.workspace import api as workspace_api
 if 'core_curate_app' in INSTALLED_APPS:
     from core_curate_app.components.curate_data_structure.models import CurateDataStructure
     import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
-if 'core_workspace_app' in INSTALLED_APPS:
-    from core_workspace_app.components.workspace import api as workspace_api
 
 
 def _check_rights_document(request_user_is_superuser, request_user_id, document_user):
