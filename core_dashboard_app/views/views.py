@@ -146,6 +146,14 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
         """
         return render(request, self.template_name, context={'form': self.get_form()})
 
+    def get_form(self):
+        """ Return the form.
+
+        Returns: The form.
+        """
+
+        return super(UserDashboardPasswordChangeFormView, self).get_form(self.form_class)
+
     def form_valid(self, form):
         """
 
