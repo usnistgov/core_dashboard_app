@@ -31,7 +31,7 @@ class UserForm(forms.Form):
 
         # We add them
         for user in sort_users:
-            if user.id != currentUser.id:
+            if user.id != currentUser.id or currentUser.is_superuser:
                 self.USERS_OPTIONS.append((user.id, user.username))
 
         super(UserForm, self).__init__()
