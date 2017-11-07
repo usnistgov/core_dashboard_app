@@ -318,16 +318,14 @@ def _change_owner_form(request, form_ids, user_id):
     try:
         list_form = _get_forms(form_ids, request.user.is_superuser, request.user.id)
     except Exception, e:
-        messages.add_message(request, messages.INFO, e.message)
-        return HttpResponse(json.dumps({}), content_type='application/javascript')
+        return HttpResponseBadRequest(e.message)
 
     try:
         for form in list_form:
             form.user = user_id
             curate_data_structure_api.upsert(form)
-        messages.add_message(request, messages.INFO, 'Owner changed with success.')
     except Exception, e:
-        messages.add_message(request, messages.INFO, "Something wrong occurred during the change of owner.")
+        return HttpResponseBadRequest(e.message)
 
     return HttpResponse(json.dumps({}), content_type='application/javascript')
 
@@ -346,15 +344,13 @@ def _change_owner_record(request, data_ids, user_id):
     try:
         list_data = _get_data(data_ids, request.user)
     except Exception, e:
-        messages.add_message(request, messages.INFO, e.message)
-        return HttpResponse(json.dumps({}), content_type='application/javascript')
+        return HttpResponseBadRequest(e.message)
     try:
         new_user = user_api.get_user_by_id(user_id)
         for data in list_data:
             data_api.change_owner(data, new_user, request.user)
-        messages.add_message(request, messages.INFO, 'Owner changed with success.')
     except Exception, e:
-        messages.add_message(request, messages.INFO, "Something wrong occurred during the change of owner.")
+        return HttpResponseBadRequest(e.message)
 
     return HttpResponse(json.dumps({}), content_type='application/javascript')
 

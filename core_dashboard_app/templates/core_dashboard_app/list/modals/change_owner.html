@@ -5,6 +5,12 @@
 
 
 {% block modal_body %}
+<div class="alert alert-danger" id="banner_change_owner_errors" style="display: none;">
+    <h4><i class="fa fa-exclamation-circle fa-1x"></i> Error</h4>
+    <div id="form_change_owner_errors">
+    </div>
+</div>
+
 <input type="hidden" class="{{data.document}}-id"/>
 <p>
     The owner of the document will be modified.

@@ -4,7 +4,7 @@
 changeOwnerDocument = function() {
     var $recordRow = $(this).parent().parent();
     $('.'+functional_object+'-id').val($recordRow.attr("objectid"));
-    $("#banner_errors").hide();
+    $("#banner_change_owner_errors").hide();
     $("#change-owner-modal").modal("show");
 };
 
@@ -14,15 +14,15 @@ changeOwnerDocument = function() {
 validateChangeOwner = function(){
     var errors = "";
 
-    $("#banner_errors").hide();
+    $("#banner_change_owner_errors").hide();
     // check if a user has been selected
     if ($( "#id_users" ).val().trim() == ""){
         errors = "Please provide a user."
     }
 
     if (errors != ""){
-        $("#form_start_errors").html(errors);
-        $("#banner_errors").show(500);
+        $("#form_change_owner_errors").html(errors);
+        $("#banner_change_owner_errors").show(500);
         return (false);
     }else{
         return (true);
@@ -48,8 +48,8 @@ change_owner_document = function(){
 			location.reload();
 	    },
         error:function(data){
-            $("#form_start_errors").html(data.responseText);
-            $("#banner_errors").show(500)
+            $("#form_change_owner_errors").html(data.responseText);
+            $("#banner_change_owner_errors").show(500)
         }
     });
 };
