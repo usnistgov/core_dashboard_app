@@ -43,15 +43,14 @@
                     <a class="btn btn-default edit-form-btn" href="{% url 'core_curate_enter_data' data_loaded.form.id %}">
                         <i class="fa fa-edit"></i> Edit
                     </a>
-                    {% if not user.is_superuser %}
-                        <a class="btn btn-default delete-document-btn">
-                            <i class="fa fa-trash"></i> Delete
-                        </a>
 
-                        <a class="btn btn-default change-owner-btn">
-                            <i class="fa fa-user-circle-o"></i> Change Owner
-                        </a>
-                    {% endif %}
+                    <a class="btn btn-default delete-document-btn">
+                        <i class="fa fa-trash"></i> Delete
+                    </a>
+
+                    <a class="btn btn-default change-owner-btn">
+                        <i class="fa fa-user-circle-o"></i> Change Owner
+                    </a>
                 </td>
             </tr>
         {% endfor %}
