@@ -3,21 +3,11 @@
 """
 
 import copy
-import json
-
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse, reverse_lazy
-from django.db import IntegrityError
-from django.http.response import HttpResponseRedirect
-from django.utils import timezone
-from password_policies.views import PasswordChangeFormView
 
 import core_main_app.components.data.api as workspace_data_api
 import core_main_app.components.version_manager.api as version_manager_api
 import core_main_app.components.workspace.api as workspace_api
-from core_dashboard_app import constants as dashboard_constants
-from core_dashboard_app.views.forms import ActionForm, UserForm
+from core_dashboard_app.views.common.forms import ActionForm, UserForm
 from core_main_app.components.blob import api as blob_api, utils as blob_utils
 from core_main_app.components.data import api as data_api
 from core_main_app.components.template import api as template_api
@@ -25,177 +15,17 @@ from core_main_app.components.template_version_manager import api as template_ve
 from core_main_app.components.user import api as user_api
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.utils.access_control.exceptions import AccessControlError
-from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
 from core_main_app.utils.rendering import render
-from core_main_app.views.admin.forms import EditProfileForm
 from core_main_app.views.user.forms import WorkspaceForm
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse_lazy
+
+from core_dashboard_app import constants as dashboard_constants
 if 'core_composer_app' in INSTALLED_APPS:
     from core_composer_app.components.type_version_manager import api as type_version_manager_api
     from core_composer_app.components.type import api as type_api
 if 'core_curate_app' in INSTALLED_APPS:
     import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
-
-
-@login_required(login_url=reverse_lazy("core_main_app_login"))
-def home(request):
-    """ Home page.
-
-    Args:
-        request:
-
-    Returns:
-    """
-    return render(request, dashboard_constants.DASHBOARD_HOME_TEMPLATE)
-
-
-@login_required(login_url=reverse_lazy("core_main_app_login"))
-def my_profile(request):
-    """ User's profile information page.
-
-    Args:
-        request:
-
-    Returns:
-    """
-    return render(request, dashboard_constants.DASHBOARD_PROFILE_TEMPLATE)
-
-
-@login_required(login_url=reverse_lazy("core_main_app_login"))
-def my_profile_edit(request):
-    """ Edit the profile.
-
-    Args:
-        request:
-
-    Returns:
-    """
-    if request.method == 'POST':
-        form = _get_edit_profile_form(request=request, url=dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE)
-        if form.is_valid():
-            user = request.user
-            user.first_name = request.POST['firstname']
-            user.last_name = request.POST['lastname']
-            user.email = request.POST['email']
-            try:
-                user_api.upsert(user)
-            except IntegrityError as e:
-                if 'unique constraint' in e.message:
-                    message = "A user with the same username already exists."
-                    return render(request, dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE,
-                                  context={'form': form, 'action_result': message})
-                else:
-                    _error_while_saving(request, form)
-            except Exception, e:
-                _error_while_saving(request, form)
-
-            messages.add_message(request, messages.INFO, 'Profile information edited with success.')
-            return HttpResponseRedirect(reverse("core_dashboard_profile"))
-    else:
-        user = request.user
-        data = {'firstname': user.first_name,
-                'lastname': user.last_name,
-                'username': user.username,
-                'email': user.email}
-        form = _get_edit_profile_form(request, dashboard_constants.DASHBOARD_PROFILE_TEMPLATE, data)
-
-    return render(request, dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE, context={'form': form})
-
-
-def _get_edit_profile_form(request, url, data=None):
-    """ Edit the profile.
-
-    Args:
-        request
-        url
-        data
-
-    Returns:
-    """
-    data = request.POST if data is None else data
-    try:
-        return EditProfileForm(data)
-    except Exception as e:
-        message = "A problem with the form has occurred."
-        return render(request, url,
-                      context={'action_result': message})
-
-
-def _error_while_saving(request, form):
-    """ Raise exception if uncatched problems occurred while saving.
-
-    Args:
-        request
-        form
-
-    Returns:
-    """
-    message = "A problem has occurred while saving the user."
-    return render(request, dashboard_constants.DASHBOARD_PROFILE_EDIT_TEMPLATE,
-                  context={'form': form, 'action_result': message})
-
-
-class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
-
-    def get(self, request, *args, **kwargs):
-        """
-
-        Args: request:
-        Args: args:
-        Args: kwargs:
-        Returns:
-        """
-        return render(request, self.template_name, context={'form': self.get_form()})
-
-    def get_form(self):
-        """ Return the form.
-
-        Returns: The form.
-        """
-
-        return super(UserDashboardPasswordChangeFormView, self).get_form(self.form_class)
-
-    def form_valid(self, form):
-        """
-
-        Args: form
-        Returns:
-        """
-        messages.success(self.request, "Password changed with success.")
-        return super(UserDashboardPasswordChangeFormView, self).form_valid(form)
-
-    def form_invalid(self, form):
-        """
-        If the form is invalid, re-render the context data with the
-        data-filled form and errors.
-
-        Args: form
-        Returns:
-        """
-        return render(self.request, self.template_name, context={'form': form})
-
-    def get_success_url(self):
-        """
-        Returns a query string field with a previous URL if available (Mimicing
-        the login view. Used on forced password changes, to know which URL the
-        user was requesting before the password change.)
-        If not returns the :attr:`~PasswordChangeFormView.success_url` attribute
-        if set, otherwise the URL to the :class:`PasswordChangeDoneView`.
-        """
-        checked = '_password_policies_last_checked'
-        last = '_password_policies_last_changed'
-        required = '_password_policies_change_required'
-        now = json.dumps(timezone.now(), cls=DateTimeEncoder)
-        self.request.session[checked] = now
-        self.request.session[last] = now
-        self.request.session[required] = False
-        redirect_to = self.request.POST.get(self.redirect_field_name, '')
-        if redirect_to:
-            url = redirect_to
-        elif self.success_url:
-            url = self.success_url
-        else:
-            url = reverse('password_change_done')
-        return url
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
@@ -218,10 +48,11 @@ def dashboard_workspace_records(request, workspace_id):
     user_can_read = workspace_api.can_user_read_workspace(workspace, request.user)
     user_can_write = workspace_api.can_user_write_workspace(workspace, request.user)
     for data in workspace_data:
+        is_owner = str(data.user_id) == str(request.user.id)
         detailed_user_data.append({'data': data,
-                                   'can_read': user_can_read,
-                                   'can_write': user_can_write,
-                                   'is_owner': str(data.user_id) == str(request.user.id) or request.user.is_superuser
+                                   'can_read': user_can_read or is_owner,
+                                   'can_write': user_can_write or is_owner,
+                                   'is_owner': is_owner
                                    })
 
     # Add user_form for change owner
@@ -256,8 +87,9 @@ def dashboard_workspace_records(request, workspace_id):
     }])
 
     assets['js'].extend(copy.deepcopy(dashboard_constants.JS_RECORD))
+    assets['js'].extend(copy.deepcopy(dashboard_constants.USER_VIEW_RECORD_RAW))
 
-    _handle_asset_modals(False, assets, modals, delete=True, change_owner=True, menu=False,
+    _handle_asset_modals(assets, modals, delete=True, change_owner=True, menu=False,
                          workspace=workspace.title)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
@@ -274,12 +106,9 @@ def dashboard_records(request):
         request:
     Return:
     """
-    number_columns = 4
-    if request.user.is_superuser:
-        number_columns += 2
 
     # Get user records
-    user_data = sorted(data_api.get_all(request.user),
+    user_data = sorted(data_api.get_all_by_user(request.user),
                        key=lambda data: data['last_modification_date'], reverse=True)
 
     detailed_user_data = []
@@ -297,27 +126,8 @@ def dashboard_records(request):
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
         'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
-        'number_columns': number_columns
+        'number_columns': 4,
     }
-
-    # If the user is an admin, we get records for other users
-    if request.user.is_superuser:
-        # Get all username and corresponding ids
-        user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
-        # Get all records from other users
-        other_users_data = sorted(data_api.get_all_except_user(request.user),
-                                  key=lambda data: data['last_modification_date'], reverse=True)
-        detailed_other_user_data = []
-        for data in other_users_data:
-            detailed_other_user_data.append({'data': data,
-                                             'can_read': True,
-                                             'can_write': True,
-                                             'is_owner': True})
-        context.update({'other_users_data': detailed_other_user_data,
-                        'usernames': user_names,
-                        'action_form': ActionForm([('1', 'Delete selected records'),
-                                                   ('2', 'Change owner of selected records')]),
-                        'menu': True})
 
     modals = ["core_main_app/user/workspaces/list/modals/assign_workspace.html"]
 
@@ -330,9 +140,11 @@ def dashboard_records(request):
                }]
     }
 
+    load_js = len(detailed_user_data) > 0
     assets['js'].extend(copy.deepcopy(dashboard_constants.JS_RECORD))
+    assets['js'].extend(copy.deepcopy(dashboard_constants.USER_VIEW_RECORD_RAW))
 
-    _handle_asset_modals(request.user.is_superuser, assets, modals, delete=True, change_owner=True, menu=True)
+    _handle_asset_modals(assets, modals, delete=load_js, change_owner=load_js, menu=False)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
@@ -368,28 +180,6 @@ def dashboard_forms(request):
                'template': dashboard_constants.DASHBOARD_FORMS_TEMPLATE_TABLE
                }
 
-    # If the user is an admin, we get records for other users
-    if request.user.is_superuser:
-
-        # Get all username and corresponding ids
-        user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
-
-        # Get all forms from other users
-        other_user_forms = curate_data_structure_api.get_all_except_user_id_with_no_data(request.user.id)
-
-        other_detailed_forms = []
-        for form in other_user_forms:
-            template_name = version_manager_api.get_from_version(form.template).title
-            other_detailed_forms.append({'form': form,
-                                         'template': template_name})
-
-        context.update({'other_users_data': other_detailed_forms,
-                        'usernames': user_names,
-                        'number_columns': 5,
-                        'action_form': ActionForm(
-                            [('1', 'Delete selected forms'), ('2', 'Change owner of selected forms')]),
-                        'menu': True})
-
     modals = []
 
     assets = {
@@ -398,7 +188,7 @@ def dashboard_forms(request):
         "js": []
     }
 
-    _handle_asset_modals(request.user.is_superuser, assets, modals, delete=True, change_owner=True, menu=True)
+    _handle_asset_modals(assets, modals, delete=True, change_owner=True, menu=True)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
@@ -436,24 +226,6 @@ def dashboard_templates(request):
         'object_name': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TEMPLATE,
         'template': dashboard_constants.DASHBOARD_TEMPLATES_TEMPLATE_TABLE
     }
-    # If the user is an admin, we get records for other users
-    if request.user.is_superuser:
-
-        # Get all templates from other users
-        other_template_versions = template_version_manager_api.get_all_version_manager_except_user_id(request.user.id)
-
-        detailed_other_users_templates = []
-        for other_template_version in other_template_versions:
-
-            # If the version manager doesn't have a user, the template is global.
-            if other_template_version.user is not None:
-                detailed_other_users_templates.append({'template_version': other_template_version,
-                                                       'template': template_api.get(other_template_version.current),
-                                                       'user': user_api.get_user_by_id(other_template_version.user).username,
-                                                       'title': other_template_version.title})
-
-        context.update({'other_users_data': detailed_other_users_templates,
-                        'number_columns': 4, 'menu': True})
 
     modals = [
                 "core_main_app/admin/templates/list/modals/edit.html",
@@ -477,7 +249,7 @@ def dashboard_templates(request):
                 }]
     }
 
-    _handle_asset_modals(request.user.is_superuser, assets, modals,
+    _handle_asset_modals(assets, modals,
                          delete=False,
                          change_owner=False,
                          menu=True)
@@ -515,31 +287,11 @@ def dashboard_types(request):
         'object_name': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TYPE,
         'template': dashboard_constants.DASHBOARD_TYPES_TEMPLATE_TABLE
     }
-    # If the user is an admin, we get records for other users
-    if request.user.is_superuser:
-
-        # Get all types from other users
-        other_type_versions = type_version_manager_api.get_all_version_manager_except_user_id(request.user.id)
-
-        detailed_other_users_types = []
-        for other_type_version in other_type_versions:
-
-            # If the version manager doesn't have a user, the type is global.
-            if other_type_version.user is not None:
-                detailed_other_users_types.append({'type_version': other_type_version,
-                                                   'type': type_api.get(other_type_version.current),
-                                                   'user': user_api.get_user_by_id(other_type_version.user).username,
-                                                   'title': other_type_version.title})
-
-        context.update({'other_users_data': detailed_other_users_types,
-                        'number_columns': 4,
-                        'action_form': ActionForm([('1', 'Delete selected types')]),
-                        'menu': True})
 
     modals = [
                 "core_main_app/admin/templates/list/modals/edit.html",
                 "core_main_app/admin/templates/list/modals/disable.html"
-            ]
+             ]
 
     assets = {
         "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
@@ -558,7 +310,7 @@ def dashboard_types(request):
                 }]
     }
 
-    _handle_asset_modals(request.user.is_superuser, assets, modals,
+    _handle_asset_modals(assets, modals,
                          delete=False,
                          change_owner=False,
                          menu=True)
@@ -592,26 +344,6 @@ def dashboard_files(request):
         'template': dashboard_constants.DASHBOARD_FILES_TEMPLATE_TABLE
     }
 
-    # If the user is an admin, we get files of other users
-    if request.user.is_superuser:
-
-        # Get all files from other users
-        other_files = blob_api.get_all_except_user_id(request.user.id)
-
-        detailed_other_users_files = []
-        for other_file in other_files:
-            detailed_other_users_files.append({'user': user_api.get_user_by_id(other_file.user_id).username,
-                                               'date': other_file.id.generation_time,
-                                               'file': other_file,
-                                               'url': blob_utils.get_blob_download_uri(other_file, request)
-                                               })
-
-        context.update({'other_users_data': detailed_other_users_files,
-                        'number_columns': 5,
-                        'action_form': ActionForm([('1', 'Delete selected files')]),
-                        'menu': True
-                        })
-
     modals = []
 
     assets = {
@@ -620,7 +352,7 @@ def dashboard_files(request):
         "js": []
     }
 
-    _handle_asset_modals(request.user.is_superuser, assets, modals,
+    _handle_asset_modals(assets, modals,
                          delete=True,
                          change_owner=False,
                          menu=True)
@@ -683,7 +415,7 @@ def dashboard_workspaces(request):
         ]
     }
 
-    _handle_asset_modals(request.user.is_superuser, assets, modals,
+    _handle_asset_modals(assets, modals,
                          delete=True,
                          change_owner=False,
                          menu=False)
@@ -694,11 +426,10 @@ def dashboard_workspaces(request):
                   modals=modals)
 
 
-def _handle_asset_modals(user_is_superuser, assets, modal, delete=False, change_owner=False, menu=False, workspace=False):
+def _handle_asset_modals(assets, modal, delete=False, change_owner=False, menu=False, workspace=False):
     """ Add needed assets.
 
     Args:
-        user_is_superuser
         assets
         modal
         delete
@@ -709,7 +440,7 @@ def _handle_asset_modals(user_is_superuser, assets, modal, delete=False, change_
     """
 
     # Admin or user assets
-    assets['js'].extend(dashboard_constants.JS_ADMIN if user_is_superuser else dashboard_constants.JS_USER)
+    assets['js'].extend(dashboard_constants.JS_USER)
 
     # Common asset
     assets['js'].extend(dashboard_constants.JS_COMMON)
@@ -721,7 +452,4 @@ def _handle_asset_modals(user_is_superuser, assets, modal, delete=False, change_
         modal.extend(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
 
     # Menu
-    if menu and user_is_superuser and not workspace:
-        assets['js'].extend(dashboard_constants.JS_ADMIN_MENU)
-    else:
-        assets['js'].extend(dashboard_constants.JS_USER_SELECTED_ELEMENT)
+    assets['js'].extend(dashboard_constants.JS_USER_SELECTED_ELEMENT)

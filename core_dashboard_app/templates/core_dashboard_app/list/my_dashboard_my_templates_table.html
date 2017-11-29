@@ -4,7 +4,7 @@
     <thead>
         <th>Template name</th>
         <th>Filename</th>
-        {% if user.is_superuser %}
+        {% if come_from_admin %}
             <th>User</th>
         {% endif %}
         <th>Actions</th>
@@ -14,7 +14,7 @@
             <tr objectid="{{object.template_version.id}}">
                 <td>{{ object.title }}</td>
                 <td>{{ object.template.filename }}</td>
-                {% if user.is_superuser %}
+                {% if come_from_admin %}
                     <td>
                         {{object.user}}
                     </td>
@@ -25,17 +25,23 @@
                         <i class="fa fa-undo"></i> Restore
                     </a>
                     {% else %}
-                    <a class="btn btn-default view-{{data.document}}-btn" href="{% url 'core_main_app_manage_template_versions' object.template_version.id %}">
-                        <i class="fa fa-list"></i> Versions
-                    </a>
+                        {% if come_from_admin %}
+                            <a class="btn btn-default view-{{data.document}}-btn" href="{% url 'admin:core_main_app_manage_template_versions' object.template_version.id %}">
+                                <i class="fa fa-list"></i> Versions
+                            </a>
+                        {% else %}
+                            <a class="btn btn-default view-{{data.document}}-btn" href="{% url 'core_main_app_manage_template_versions' object.template_version.id %}">
+                                <i class="fa fa-list"></i> Versions
+                            </a>
+                        {% endif %}
 
-                    <a class="btn btn-default edit-{{data.document}}-btn" objectid="{{ object.template_version.id }}">
-                        <i class="fa fa-edit"></i> Edit
-                    </a>
+                        <a class="btn btn-default edit-{{data.document}}-btn" objectid="{{ object.template_version.id }}">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
 
-                    <a class="btn btn-default disable-{{data.document}}-btn" objectid="{{ object.template_version.id }}">
-                        <i class="fa fa-trash"></i> Disable
-                    </a>
+                        <a class="btn btn-default disable-{{data.document}}-btn" objectid="{{ object.template_version.id }}">
+                            <i class="fa fa-trash"></i> Disable
+                        </a>
                     {% endif %}
 
                 </td>

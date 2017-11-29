@@ -1,10 +1,12 @@
 {% extends 'core_main_app/_render/admin/theme/tools/box.html' %}
 
 {% block box_title %}
-{% if data.title %}
-    <h1><span>{{data.title}}</span></h1>
-{% else %}
-    <h1><span>{% if user.is_superuser %}All {%else%}My {% endif %}{{data.document}}s</span></h1>
+{% if not come_from_admin %}
+    {% if data.title %}
+        <h1>{{data.title}}</h1>
+    {% else %}
+        <h1>My {{data.document}}s</h1>
+    {% endif %}
 {% endif %}
 {% endblock %}
 
@@ -26,11 +28,7 @@
 
 {% block box_body %}
 
-    {% if user.is_superuser and data.menu and not data.title %}
-        <ul  class="nav nav-tabs">
-            <li class="active"> <a href="#admin" data-toggle="tab" onclick="resetCheckbox();" style="text-decoration:none;">Mine</a> </li>
-            <li><a href="#others" data-toggle="tab" onclick="resetCheckbox();" style="text-decoration:none;">Others</a> </li>
-        </ul>
+    {% if data.menu and not data.title %}
         <div class="dropdown" id="id_actions" style="display:none">
             <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 Choose action
@@ -45,32 +43,15 @@
     {% endif %}
 
     <div class="tab-content">
-        {% if user.is_superuser and not data.title %}
-          <div class="tab-pane active" id="admin" style="width:98%">
-            {% if data.user_data %}
-                {% include data.template with objects=data.user_data group='admin' %}
-            {% else %}
-            <div class="empty-table">
-                You don't currently own any {{ data.document }}.
-            </div>
-            {% endif %}
-          </div>
-          <div class="tab-pane" id="others" style="width:98%">
-            {% if data.other_users_data%}
-                {% include data.template with objects=data.other_users_data group='other' %}
-            {%else%}
-              <div class="empty-table">
-                No other users {{ data.document }}s found
-              </div>
-            {%endif%}
-          </div>
-        {% else %}
             {% if data.user_data %}
                 {% include data.template with objects=data.user_data group='user' %}
             {% else %}
-                No {{data.document}}s found.
+                {% if data.other_users_data %}
+                        {% include data.template with objects=data.other_users_data group='other' %}
+                {%else%}
+                    No {{data.document}}s found.
+                {% endif %}
             {% endif %}
-        {% endif %}
     </div>
 {% endblock %}
 

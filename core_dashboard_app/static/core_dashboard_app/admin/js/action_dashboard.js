@@ -11,4 +11,4 @@ action_dashboard = function(selectValue) {
     else if (selectValue == 2) {
         changeOwnerDocument();
     }
-}
+};

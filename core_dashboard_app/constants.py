@@ -9,6 +9,7 @@ DASHBOARD_HOME_TEMPLATE = 'core_dashboard_app/home.html'
 DASHBOARD_PROFILE_TEMPLATE = 'core_dashboard_app/my_profile.html'
 DASHBOARD_PROFILE_EDIT_TEMPLATE = 'core_dashboard_app/my_profile_edit.html'
 DASHBOARD_TEMPLATE = 'core_dashboard_app/my_dashboard.html'
+ADMIN_DASHBOARD_TEMPLATE = 'core_dashboard_app/admin/dashboard.html'
 
 # Tables
 DASHBOARD_RECORDS_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_records_table.html'
@@ -105,9 +106,19 @@ JS_RECORD = [{
                 "is_raw": False
              },
              {
-                "path": 'core_dashboard_app/user/js/list/view_record.js',
+                "path": 'core_dashboard_app/common/js/list/view_record.js',
                 "is_raw": False
              }]
+
+USER_VIEW_RECORD_RAW = [{
+                           "path": 'core_dashboard_app/user/js/list/view_record.raw.js',
+                           "is_raw": True
+                        }]
+
+ADMIN_VIEW_RECORD_RAW = [{
+                            "path": 'core_dashboard_app/admin/js/list/view_record.raw.js',
+                            "is_raw": True
+                         }]
 
 
 FUNCTIONAL_OBJECT_ENUM = enum(RECORD='record',

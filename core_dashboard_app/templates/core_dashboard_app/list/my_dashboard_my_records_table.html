@@ -2,12 +2,12 @@
 
 <table id="table-{{data.document}}-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
     <thead>
-        {% if user.is_superuser and not data.title %}
+        {% if data.menu and not data.title %}
             <th> <input type="checkbox" id="select_all_{{group}}" onchange="selectAll(this, '{{group}}')"> </th>
         {% endif %}
         <th>Name</th>
         <th>Last Modification date</th>
-        {% if user.is_superuser or data.title%}
+        {% if data.usernames %}
             <th>User</th>
         {% endif %}
         {% if not data.title%}
@@ -18,24 +18,20 @@
     <tbody>
         {% for data_loaded in objects %}
             <tr objectid="{{data_loaded.data.id}}">
-                {% if user.is_superuser and not data.title %}
+                {% if data.menu and not data.title %}
                 <td id="actionCheckbox">
                     <input type="checkbox" id={{data_loaded.data.id}} name={{group}}>
                 </td>
                 {% endif %}
                 <td>
-                    {% if data_loaded.data.content.Resource.identity.title %}
-                        {{ data_loaded.data.content.Resource.identity.title }}
-                    {% else %}
-                        <script>
-                            document.write('{{ data_loaded.data.title }}'.replace(/\.[^/.]+$/, ""));
-                        </script>
-                    {% endif %}
+                    <script>
+                        document.write('{{ data_loaded.data.title }}'.replace(/\.[^/.]+$/, ""));
+                    </script>
                 </td>
                 <td>
                     {{ data_loaded.data.last_modification_date|date:"Y/m/d, g:i A " }}
                 </td>
-                {% if user.is_superuser or data.title%}
+                {% if data.usernames %}
                 <td>
                     {% with key=data_loaded.data.user_id %}
                       {{ data.usernames|get:key }}
