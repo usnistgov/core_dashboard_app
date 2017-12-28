@@ -425,7 +425,7 @@ def dashboard_workspaces(request):
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.WORKSPACE,
         'template': dashboard_constants.DASHBOARD_WORKSPACES_TEMPLATE_TABLE,
         'number_columns': 5,
-        'create_workspace': True
+        'create_workspace': False
     }
 
     modals = ["core_main_app/user/workspaces/list/create_workspace.html",
@@ -435,14 +435,9 @@ def dashboard_workspaces(request):
         "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
         "js": [{
-                    "path": 'core_main_app/user/js/workspaces/create_workspace.js',
-                    "is_raw": False
-               },
-               {
                     "path": 'core_main_app/user/js/workspaces/list/modals/set_public.js',
                     "is_raw": False
-               }
-        ]
+               }]
     }
 
     _handle_asset_modals(assets,
