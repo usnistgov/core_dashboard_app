@@ -60,7 +60,8 @@ def dashboard_workspace_records(request, workspace_id):
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
         'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
-        'number_columns': 4
+        'number_columns': 4,
+        'administration': True
     }
 
     # Get all username and corresponding ids
@@ -128,7 +129,8 @@ def dashboard_records(request):
         'usernames': user_names,
         'action_form': ActionForm([('1', 'Delete selected records'),
                                    ('2', 'Change owner of selected records')]),
-        'menu': True
+        'menu': True,
+        'administration': True
     }
 
     modals = ["core_main_app/user/workspaces/list/modals/assign_workspace.html"]

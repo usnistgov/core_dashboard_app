@@ -62,7 +62,8 @@ def dashboard_workspace_records(request, workspace_id):
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
         'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
-        'number_columns': number_columns
+        'number_columns': number_columns,
+        'administration': False
     }
 
     # Get all username and corresponding ids
@@ -127,6 +128,7 @@ def dashboard_records(request):
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
         'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
         'number_columns': 4,
+        'administration': False
     }
 
     modals = ["core_main_app/user/workspaces/list/modals/assign_workspace.html"]
