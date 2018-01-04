@@ -1,3 +1,3 @@
-core-composer-app==1.0.0-alpha5
-core-curate-app==1.0.0-alpha5
-core-main-app==1.0.0-alpha5
+core-composer-app==1.0.0-alpha6
+core-curate-app==1.0.0-alpha6
+core-main-app==1.0.0-alpha6
