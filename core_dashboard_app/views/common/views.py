@@ -1,14 +1,12 @@
 """
     Common views
 """
+import copy
 import json
 
-from core_main_app.components.user import api as user_api
-from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
-from core_main_app.utils.rendering import render
-from core_main_app.views.admin.forms import EditProfileForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import IntegrityError
 from django.http.response import HttpResponseRedirect
@@ -16,6 +14,15 @@ from django.utils import timezone
 from password_policies.views import PasswordChangeFormView
 
 from core_dashboard_app import constants as dashboard_constants
+from core_dashboard_app.views.common.forms import ActionForm, UserForm
+from core_main_app.components.data import api as data_api
+from core_main_app.components.user import api as user_api
+from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
+from core_main_app.utils.rendering import render
+from core_main_app.views.admin.forms import EditProfileForm
+from core_main_app.views.common.views import CommonView
+from core_dashboard_app import settings
+from core_main_app.utils.pagination.django_paginator.results_paginator import ResultsPaginator
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
@@ -178,3 +185,94 @@ class UserDashboardPasswordChangeFormView(PasswordChangeFormView):
         else:
             url = reverse('password_change_done')
         return url
+
+
+class DashboardRecords(CommonView):
+    """ List the records.
+    """
+
+    template = dashboard_constants.DASHBOARD_TEMPLATE
+
+    def get(self, request, *args, **kwargs):
+
+        # Get records
+        if self.administration:
+            loaded_data = data_api.get_all(request.user, '-last_modification_date')
+            # Get all username and corresponding ids
+            user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
+        else:
+            loaded_data = data_api.get_all_by_user(request.user, '-last_modification_date')
+
+        # Paginator
+        page = request.GET.get('page', 1)
+        data = ResultsPaginator.get_results(loaded_data, page, settings.RECORD_PER_PAGE_PAGINATION)
+
+        detailed_loaded_data = []
+        for object in data.object_list:
+            detailed_loaded_data.append({'data': object,
+                                         'can_read': True,
+                                         'can_write': True,
+                                         'is_owner': True})
+
+        data.object_list = detailed_loaded_data
+
+        # Add user_form for change owner
+        user_form = UserForm(request.user)
+        context = {
+            'other_users_data': data,
+            'user_form': user_form,
+            'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
+            'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE_PAGINATION,
+            'action_form': ActionForm([('1', 'Delete selected records'),
+                                       ('2', 'Change owner of selected records')]),
+            'menu': self.administration,
+            'administration': self.administration
+        }
+
+        if self.administration:
+            context.update({'usernames': user_names})
+
+        modals = ["core_main_app/user/workspaces/list/modals/assign_workspace.html"]
+        modals.extend(dashboard_constants.MODALS_COMMON_DELETE)
+        modals.extend(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
+
+        assets = {
+            "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
+
+            "js": [
+                    {
+                        "path": 'core_main_app/user/js/workspaces/list/modals/assign_workspace.js',
+                        "is_raw": False
+                    },
+                    {
+                        "path": 'core_dashboard_app/common/js/init_pagination.js',
+                        "is_raw": False
+                    },
+                    {
+                        "path": 'core_dashboard_app/user/js/init.raw.js',
+                        "is_raw": True
+                    }]
+        }
+
+        # Common asset
+        assets['js'].extend(copy.deepcopy(dashboard_constants.JS_COMMON_FUNCTION_DELETE))
+        assets['js'].extend(copy.deepcopy(dashboard_constants.JS_COMMON_FUNCTION_CHANGE_OWNER))
+
+        # Admin
+        if self.administration:
+            assets['js'].extend(copy.deepcopy(dashboard_constants.ADMIN_VIEW_RECORD_RAW))
+            assets['js'].extend(copy.deepcopy(dashboard_constants.JS_ADMIN_MENU))
+            assets['js'].extend([{
+                                    "path": 'core_dashboard_app/admin/js/action_dashboard.js',
+                                    "is_raw": True
+                                }])
+        else:
+            assets['js'].extend(copy.deepcopy(dashboard_constants.JS_USER_SELECTED_ELEMENT))
+            assets['js'].extend(copy.deepcopy(dashboard_constants.USER_VIEW_RECORD_RAW))
+
+        assets['js'].extend(copy.deepcopy(dashboard_constants.JS_RECORD))
+
+        return self.common_render(request, self.template,
+                                  context=context,
+                                  assets=assets,
+                                  modals=modals)

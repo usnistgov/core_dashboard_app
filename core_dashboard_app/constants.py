@@ -13,6 +13,8 @@ ADMIN_DASHBOARD_TEMPLATE = 'core_dashboard_app/admin/dashboard.html'
 
 # Tables
 DASHBOARD_RECORDS_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_records_table.html'
+DASHBOARD_RECORDS_TEMPLATE_TABLE_DATATABLE = 'core_dashboard_app/list/my_dashboard_my_records_table_datatable.html'
+DASHBOARD_RECORDS_TEMPLATE_TABLE_PAGINATION = 'core_dashboard_app/list/my_dashboard_my_records_table_pagination.html'
 DASHBOARD_FORMS_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_forms_table.html'
 DASHBOARD_TEMPLATES_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_templates_table.html'
 DASHBOARD_TYPES_TEMPLATE_TABLE = 'core_dashboard_app/list/my_dashboard_my_types_table.html'

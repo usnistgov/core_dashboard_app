@@ -61,7 +61,7 @@ def dashboard_workspace_records(request, workspace_id):
         'user_data': detailed_user_data,
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
-        'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
+        'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE_DATATABLE,
         'number_columns': number_columns,
         'administration': False
     }
@@ -92,61 +92,6 @@ def dashboard_workspace_records(request, workspace_id):
 
     _handle_asset_modals(assets, modals, delete=True, change_owner=True, menu=False,
                          workspace=workspace.title)
-
-    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
-                  context=context,
-                  assets=assets,
-                  modals=modals)
-
-
-@login_required(login_url=reverse_lazy("core_main_app_login"))
-def dashboard_records(request):
-    """ List the records.
-
-    Args:
-        request:
-    Return:
-    """
-
-    # Get user records
-    user_data = sorted(data_api.get_all_by_user(request.user),
-                       key=lambda data: data['last_modification_date'], reverse=True)
-
-    detailed_user_data = []
-    for data in user_data:
-        detailed_user_data.append({'data': data,
-                                   'can_read': True,
-                                   'can_write': True,
-                                   'is_owner': True
-                                   })
-
-    # Add user_form for change owner
-    user_form = UserForm(request.user)
-    context = {
-        'user_data': detailed_user_data,
-        'user_form': user_form,
-        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
-        'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
-        'number_columns': 4,
-        'administration': False
-    }
-
-    modals = ["core_main_app/user/workspaces/list/modals/assign_workspace.html"]
-
-    assets = {
-        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
-
-        "js": [{
-                    "path": 'core_main_app/user/js/workspaces/list/modals/assign_workspace.js',
-                    "is_raw": False
-               }]
-    }
-
-    load_js = len(detailed_user_data) > 0
-    assets['js'].extend(copy.deepcopy(dashboard_constants.JS_RECORD))
-    assets['js'].extend(copy.deepcopy(dashboard_constants.USER_VIEW_RECORD_RAW))
-
-    _handle_asset_modals(assets, modals, delete=load_js, change_owner=load_js, menu=False)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,

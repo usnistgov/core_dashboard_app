@@ -9,7 +9,6 @@ import core_main_app.components.version_manager.api as version_manager_api
 import core_main_app.components.workspace.api as workspace_api
 from core_dashboard_app.views.common.forms import ActionForm, UserForm
 from core_main_app.components.blob import api as blob_api, utils as blob_utils
-from core_main_app.components.data import api as data_api
 from core_main_app.components.template import api as template_api
 from core_main_app.components.template_version_manager import api as template_version_manager_api
 from core_main_app.components.user import api as user_api
@@ -19,6 +18,7 @@ from core_main_app.utils.rendering import admin_render
 from core_main_app.views.user.forms import WorkspaceForm
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
+
 
 from core_dashboard_app import constants as dashboard_constants
 if 'core_composer_app' in INSTALLED_APPS:
@@ -59,7 +59,7 @@ def dashboard_workspace_records(request, workspace_id):
         'other_users_data': detailed_user_data,
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
-        'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
+        'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE_DATATABLE,
         'number_columns': 4,
         'administration': True
     }
@@ -90,64 +90,6 @@ def dashboard_workspace_records(request, workspace_id):
 
     _handle_asset_modals(assets, modals, delete=True, change_owner=True, menu=False,
                          workspace=workspace.title)
-
-    return admin_render(request, dashboard_constants.ADMIN_DASHBOARD_TEMPLATE,
-                        context=context,
-                        assets=assets,
-                        modals=modals)
-
-
-@login_required(login_url=reverse_lazy("core_main_app_login"))
-def dashboard_records(request):
-    """ List the records.
-
-    Args:
-        request:
-    Return:
-    """
-
-    # Get all username and corresponding ids
-    user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
-    # Get all records
-    other_users_data = sorted(data_api.get_all(request.user),
-                              key=lambda data: data['last_modification_date'], reverse=True)
-    detailed_other_user_data = []
-    for data in other_users_data:
-        detailed_other_user_data.append({'data': data,
-                                         'can_read': True,
-                                         'can_write': True,
-                                         'is_owner': True})
-
-    # Add user_form for change owner
-    user_form = UserForm(request.user)
-    context = {
-        'other_users_data': detailed_other_user_data,
-        'user_form': user_form,
-        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
-        'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE,
-        'number_columns': 6,
-        'usernames': user_names,
-        'action_form': ActionForm([('1', 'Delete selected records'),
-                                   ('2', 'Change owner of selected records')]),
-        'menu': True,
-        'administration': True
-    }
-
-    modals = ["core_main_app/user/workspaces/list/modals/assign_workspace.html"]
-
-    assets = {
-        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
-
-        "js": [{
-                    "path": 'core_main_app/user/js/workspaces/list/modals/assign_workspace.js',
-                    "is_raw": False
-               }]
-    }
-
-    assets['js'].extend(copy.deepcopy(dashboard_constants.JS_RECORD))
-    assets['js'].extend(copy.deepcopy(dashboard_constants.ADMIN_VIEW_RECORD_RAW))
-
-    _handle_asset_modals(assets, modals, delete=True, change_owner=True, menu=True)
 
     return admin_render(request, dashboard_constants.ADMIN_DASHBOARD_TEMPLATE,
                         context=context,

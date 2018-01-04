@@ -2,12 +2,11 @@
     Url router for the user dashboard
 """
 from django.conf.urls import url
+from django.contrib.auth.decorators import login_required
 
 from core_dashboard_app.views.common import ajax, views as common_views
-from core_dashboard_app.views.user import views as user_views
 from core_dashboard_app.views.common.views import UserDashboardPasswordChangeFormView
-from core_main_app.settings import INSTALLED_APPS
-from core_main_app.views.user import ajax as workspace_ajax
+from core_dashboard_app.views.user import views as user_views
 
 urlpatterns = [
 
@@ -24,7 +23,7 @@ urlpatterns = [
     url(r'^edit-record', ajax.edit_record, name='core_dashboard_edit_record'),
 
     # User
-    url(r'^records$', user_views.dashboard_records, name='core_dashboard_records'),
+    url(r'^records$', login_required(common_views.DashboardRecords.as_view()), name='core_dashboard_records'),
     url(r'^forms$', user_views.dashboard_forms, name='core_dashboard_forms'),
     url(r'^templates$', user_views.dashboard_templates, name='core_dashboard_templates'),
     url(r'^types$', user_views.dashboard_types, name='core_dashboard_types'),
