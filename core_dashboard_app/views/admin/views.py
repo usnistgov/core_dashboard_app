@@ -119,7 +119,7 @@ def dashboard_forms(request):
     user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
 
     # Get all forms from other users
-    other_user_forms = curate_data_structure_api.get_all()
+    other_user_forms = curate_data_structure_api.get_all_with_no_data()
 
     other_detailed_forms = []
     for form in other_user_forms:
