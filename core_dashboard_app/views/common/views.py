@@ -6,7 +6,6 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import IntegrityError
 from django.http.response import HttpResponseRedirect
@@ -14,15 +13,16 @@ from django.utils import timezone
 from password_policies.views import PasswordChangeFormView
 
 from core_dashboard_app import constants as dashboard_constants
+from core_dashboard_app import settings
 from core_dashboard_app.views.common.forms import ActionForm, UserForm
 from core_main_app.components.data import api as data_api
 from core_main_app.components.user import api as user_api
+from core_main_app.utils.access_control.exceptions import AccessControlError
 from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
+from core_main_app.utils.pagination.django_paginator.results_paginator import ResultsPaginator
 from core_main_app.utils.rendering import render
 from core_main_app.views.admin.forms import EditProfileForm
 from core_main_app.views.common.views import CommonView
-from core_dashboard_app import settings
-from core_main_app.utils.pagination.django_paginator.results_paginator import ResultsPaginator
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
@@ -197,7 +197,10 @@ class DashboardRecords(CommonView):
 
         # Get records
         if self.administration:
-            loaded_data = data_api.get_all(request.user, '-last_modification_date')
+            try:
+                loaded_data = data_api.get_all(request.user, '-last_modification_date')
+            except AccessControlError, ace:
+                loaded_data = []
             # Get all username and corresponding ids
             user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
         else:
