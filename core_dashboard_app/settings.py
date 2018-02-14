@@ -11,16 +11,17 @@ SERVER_URI = getattr(settings, 'SERVER_URI', "http://localhost")
 
 INSTALLED_APPS = getattr(settings, 'INSTALLED_APPS', [])
 
-menu = {'My Files': 'core_dashboard_files',
-        'My Templates': 'core_dashboard_templates',
-        'My Records': 'core_dashboard_records',
-        'My Profile': 'core_dashboard_profile',
-        'My Workspaces': 'core_dashboard_workspaces'}
+menu = {
+    'My Templates': ('core_dashboard_templates', 1000),
+    'My Records': ('core_dashboard_records', 2000),
+    'My Files': ('core_dashboard_files', 3000),
+    'My Workspaces': ('core_dashboard_workspaces', 4000),
+}
 
 if 'core_composer_app' in INSTALLED_APPS:
-    menu['My Types'] = 'core_dashboard_types'
+    menu['My Types'] = ('core_dashboard_types', 1500)
 if 'core_curate_app' in INSTALLED_APPS:
-    menu['My Forms'] = 'core_dashboard_forms'
+    menu['My Forms'] = ('core_dashboard_forms', 2500)
 
 # Menu
 DASHBOARD_MENU = getattr(settings, 'DASHBOARD_MENU', menu)

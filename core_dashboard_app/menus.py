@@ -7,8 +7,12 @@ from core_dashboard_app.settings import DASHBOARD_MENU, INSTALLED_APPS
 
 for item in DASHBOARD_MENU:
     Menu.add_item(
-        "dashboard", MenuItem(item, reverse(DASHBOARD_MENU[item]))
+        "dashboard", MenuItem(item, reverse(DASHBOARD_MENU[item][0]), weight=DASHBOARD_MENU[item][1])
     )
+
+Menu.add_item(
+    "user", MenuItem("My Profile", reverse('core_dashboard_profile'))
+)
 
 sharing_children = (
     MenuItem("All Records", reverse("admin:core_dashboard_records"), icon="list"),
