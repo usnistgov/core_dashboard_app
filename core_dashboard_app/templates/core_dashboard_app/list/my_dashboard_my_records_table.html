@@ -4,6 +4,7 @@
         <th> <input type="checkbox" id="select_all_{{group}}" onchange="selectAll(this, '{{group}}')"> </th>
     {% endif %}
     <th>Name</th>
+    <th>Template</th>
     <th>Last Modification date</th>
     {% if data.usernames %}
         <th>User</th>
@@ -25,6 +26,8 @@
                 <script>
                     document.write('{{ data_loaded.data.title }}'.replace(/\.[^/.]+$/, ""));
                 </script>
+            </td>
+            <td> {{ data_loaded.data.template.display_name }}
             </td>
             <td>
                 {{ data_loaded.data.last_modification_date|date:"Y/m/d, g:i A " }}

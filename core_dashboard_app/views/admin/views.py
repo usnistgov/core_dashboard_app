@@ -50,7 +50,8 @@ def dashboard_workspace_records(request, workspace_id):
         detailed_user_data.append({'data': data,
                                    'can_read': user_can_read,
                                    'can_write': user_can_write,
-                                   'is_owner': True
+                                   'is_owner': True,
+                                   'template_name': data.template._display_name
                                    })
 
     # Add user_form for change owner
@@ -60,7 +61,7 @@ def dashboard_workspace_records(request, workspace_id):
         'user_form': user_form,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
         'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE_DATATABLE,
-        'number_columns': 4,
+        'number_columns': 5,
         'administration': True
     }
 
@@ -132,9 +133,8 @@ def dashboard_forms(request):
 
     other_detailed_forms = []
     for form in other_user_forms:
-        template_name = version_manager_api.get_from_version(form.template).title
         other_detailed_forms.append({'form': form,
-                                     'template': template_name})
+                                     'template': form.template._display_name})
 
     context.update({'other_users_data': other_detailed_forms,
                     'usernames': user_names,

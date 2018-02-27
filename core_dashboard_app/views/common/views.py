@@ -208,21 +208,21 @@ class DashboardRecords(CommonView):
 
         # Paginator
         page = request.GET.get('page', 1)
-        data = ResultsPaginator.get_results(loaded_data, page, settings.RECORD_PER_PAGE_PAGINATION)
+        results_paginator = ResultsPaginator.get_results(loaded_data, page, settings.RECORD_PER_PAGE_PAGINATION)
 
         detailed_loaded_data = []
-        for object in data.object_list:
-            detailed_loaded_data.append({'data': object,
+        for data in results_paginator.object_list:
+            detailed_loaded_data.append({'data': data,
                                          'can_read': True,
                                          'can_write': True,
                                          'is_owner': True})
 
-        data.object_list = detailed_loaded_data
+        results_paginator.object_list = detailed_loaded_data
 
         # Add user_form for change owner
         user_form = UserForm(request.user)
         context = {
-            'other_users_data': data,
+            'other_users_data': results_paginator,
             'user_form': user_form,
             'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD,
             'template': dashboard_constants.DASHBOARD_RECORDS_TEMPLATE_TABLE_PAGINATION,

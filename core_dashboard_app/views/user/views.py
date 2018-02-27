@@ -43,7 +43,7 @@ def dashboard_workspace_records(request, workspace_id):
     except AccessControlError, ace:
         workspace_data = []
 
-    number_columns = 4
+    number_columns = 5
     detailed_user_data = []
     user_can_read = workspace_api.can_user_read_workspace(workspace, request.user)
     user_can_write = workspace_api.can_user_write_workspace(workspace, request.user)
@@ -52,8 +52,7 @@ def dashboard_workspace_records(request, workspace_id):
         detailed_user_data.append({'data': data,
                                    'can_read': user_can_read or is_owner,
                                    'can_write': user_can_write or is_owner,
-                                   'is_owner': is_owner
-                                   })
+                                   'is_owner': is_owner})
 
     # Add user_form for change owner
     user_form = UserForm(request.user)
@@ -126,9 +125,7 @@ def dashboard_forms(request):
 
     detailed_forms = []
     for form in forms:
-        template_name = version_manager_api.get_from_version(form.template).title
-        detailed_forms.append({'form': form,
-                               'template': template_name})
+        detailed_forms.append({'form': form})
 
     context = {'user_data': detailed_forms,
                'user_form': user_form,
