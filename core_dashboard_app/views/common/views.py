@@ -235,9 +235,10 @@ class DashboardRecords(CommonView):
         if self.administration:
             context.update({'usernames': user_names})
 
-        modals = ["core_main_app/user/workspaces/list/modals/assign_workspace.html"]
-        modals.extend(dashboard_constants.MODALS_COMMON_DELETE)
-        modals.extend(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
+        modals = ["core_main_app/user/workspaces/list/modals/assign_workspace.html",
+                  dashboard_constants.MODALS_COMMON_DELETE,
+                  dashboard_constants.MODALS_COMMON_CHANGE_OWNER
+                  ]
 
         assets = {
             "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
@@ -254,26 +255,65 @@ class DashboardRecords(CommonView):
                     {
                         "path": 'core_dashboard_app/user/js/init.raw.js',
                         "is_raw": True
-                    }]
+                    },
+                    {
+                        "path": dashboard_constants.JS_EDIT_RECORD,
+                        "is_raw": False
+                    },
+                    {
+                        "path": dashboard_constants.JS_VIEW_RECORD,
+                        "is_raw": False
+                    },
+                    {
+                        "path": dashboard_constants.JS_COMMON_FUNCTION_CHANGE_OWNER,
+                        "is_raw": False
+                    },
+                    {
+                        "path": dashboard_constants.JS_COMMON_FUNCTION_DELETE,
+                        "is_raw": False
+                    }
+            ]
         }
-
-        # Common asset
-        assets['js'].extend(copy.deepcopy(dashboard_constants.JS_COMMON_FUNCTION_DELETE))
-        assets['js'].extend(copy.deepcopy(dashboard_constants.JS_COMMON_FUNCTION_CHANGE_OWNER))
 
         # Admin
         if self.administration:
-            assets['js'].extend(copy.deepcopy(dashboard_constants.ADMIN_VIEW_RECORD_RAW))
-            assets['js'].extend(copy.deepcopy(dashboard_constants.JS_ADMIN_MENU))
-            assets['js'].extend([{
+            assets['js'].append({
+                                    "path": dashboard_constants.ADMIN_VIEW_RECORD_RAW,
+                                    "is_raw": True
+                                 })
+            assets['js'].append({
                                     "path": 'core_dashboard_app/admin/js/action_dashboard.js',
                                     "is_raw": True
-                                }])
+                                })
+            assets['js'].append({
+                                    "path": dashboard_constants.JS_ADMIN_COUNT_CHECK,
+                                    "is_raw": True
+                                })
+            assets['js'].append({
+                                    "path": dashboard_constants.JS_ADMIN_RESET_CHECKBOX,
+                                    "is_raw": True
+                                })
+            assets['js'].append({
+                                    "path": dashboard_constants.JS_ADMIN_SELECT_ALL,
+                                    "is_raw": True
+                                })
+            assets['js'].append({
+                                    "path": dashboard_constants.JS_ADMIN_SELETED_ELEMENT,
+                                    "is_raw": False
+                                })
+            assets['js'].append({
+                                    "path": dashboard_constants.JS_ADMIN_INIT_MENU,
+                                    "is_raw": False
+                                })
         else:
-            assets['js'].extend(copy.deepcopy(dashboard_constants.JS_USER_SELECTED_ELEMENT))
-            assets['js'].extend(copy.deepcopy(dashboard_constants.USER_VIEW_RECORD_RAW))
-
-        assets['js'].extend(copy.deepcopy(dashboard_constants.JS_RECORD))
+            assets['js'].append({
+                                    "path": dashboard_constants.JS_USER_SELECTED_ELEMENT,
+                                    "is_raw": True
+                                })
+            assets['js'].append({
+                                   "path": dashboard_constants.USER_VIEW_RECORD_RAW,
+                                   "is_raw": True
+                                })
 
         return self.common_render(request, self.template,
                                   context=context,

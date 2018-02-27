@@ -79,16 +79,25 @@ def dashboard_workspace_records(request, workspace_id):
         "js": [{
                     "path": 'core_main_app/user/js/workspaces/list/modals/assign_workspace.js',
                     "is_raw": False
-               }]
+               },
+               {
+                    "path": 'core_main_app/common/js/backtoprevious.js',
+                    "is_raw": True
+               },
+               {
+                    "path": dashboard_constants.USER_VIEW_RECORD_RAW,
+                    "is_raw": True
+               },
+               {
+                    "path": dashboard_constants.JS_EDIT_RECORD,
+                    "is_raw": False
+               },
+               {
+                    "path": dashboard_constants.JS_VIEW_RECORD,
+                    "is_raw": False
+               }
+        ]
     }
-
-    assets['js'].extend([{
-        "path": 'core_main_app/common/js/backtoprevious.js',
-        "is_raw": True
-    }])
-
-    assets['js'].extend(copy.deepcopy(dashboard_constants.JS_RECORD))
-    assets['js'].extend(copy.deepcopy(dashboard_constants.USER_VIEW_RECORD_RAW))
 
     _handle_asset_modals(assets, modals, delete=True, change_owner=True, menu=False,
                          workspace=workspace.title)
@@ -387,16 +396,31 @@ def _handle_asset_modals(assets, modal, delete=False, change_owner=False, menu=F
     """
 
     # Admin or user assets
-    assets['js'].extend(dashboard_constants.JS_USER)
-
+    assets['js'].append({
+                            "path": dashboard_constants.JS_INIT_USER,
+                            "is_raw": True
+                       })
+    assets['js'].append({
+                            "path": dashboard_constants.JS_USER_TABLE,
+                            "is_raw": False
+                        })
     # Common asset
     assets['js'].extend(dashboard_constants.JS_COMMON)
     if delete:
-        assets['js'].extend(dashboard_constants.JS_COMMON_FUNCTION_DELETE)
-        modal.extend(dashboard_constants.MODALS_COMMON_DELETE)
+        assets['js'].append({
+                                "path": dashboard_constants.JS_COMMON_FUNCTION_DELETE,
+                                "is_raw": False
+                             })
+        modal.append(dashboard_constants.MODALS_COMMON_DELETE)
     if change_owner:
-        assets['js'].extend(dashboard_constants.JS_COMMON_FUNCTION_CHANGE_OWNER)
-        modal.extend(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
+        assets['js'].append({
+                              "path": dashboard_constants.JS_COMMON_FUNCTION_CHANGE_OWNER,
+                              "is_raw": False
+                            })
+        modal.append(dashboard_constants.MODALS_COMMON_CHANGE_OWNER)
 
     # Menu
-    assets['js'].extend(dashboard_constants.JS_USER_SELECTED_ELEMENT)
+    assets['js'].append({
+                            "path": dashboard_constants.JS_USER_SELECTED_ELEMENT,
+                            "is_raw": True
+                        })
