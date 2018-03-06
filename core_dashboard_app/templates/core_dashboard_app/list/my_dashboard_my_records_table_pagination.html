@@ -3,18 +3,4 @@
     {% include 'core_dashboard_app/list/my_dashboard_my_records_table.html' %}
 </table>
 
-<div class="pagination">
-    <span class="step-links">
-        {% if objects.has_previous %}
-            <a href="?page={{ objects.previous_page_number }}">previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ objects.number }} of {{ objects.paginator.num_pages }}.
-        </span>
-
-        {% if objects.has_next %}
-            <a href="?page={{ objects.next_page_number }}">next</a>
-        {% endif %}
-    </span>
-</div>
+{% include 'core_main_app/common/pagination/data_source_pagination.html' with pagination=objects%}
