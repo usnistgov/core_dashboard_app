@@ -18,7 +18,9 @@ function initUser() {
  * Return the definition of the columns
  */
 function getColumns() {
-
+    if (numberColumns == "6") {
+        return [ null, null, null, null, null, { "orderable": false } ];
+    }
     if (numberColumns == "5") {
         return [ null, null, null, null, { "orderable": false } ];
     }

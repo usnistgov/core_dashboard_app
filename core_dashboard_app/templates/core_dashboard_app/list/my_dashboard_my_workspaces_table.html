@@ -3,6 +3,7 @@
 <table id="table-{{data.document}}-{{group}}" class="display data-table" style="margin-bottom: 0em; width:100%; border: None">
     <thead>
         <th>Title</th>
+        <th>Owner</th>
         <th>Can read</th>
         <th>Can write</th>
         <th>Public</th>
@@ -12,6 +13,7 @@
         {% for object in objects %}
             <tr objectid="{{object.workspace.id}}">
                 <td>{{ object.name }}</td>
+                <td>{{ object.user }}</td>
                 <td>{{ object.can_read }}</td>
                 <td>{{ object.can_write }}</td>
                 <td>{{ object.is_public }} </td>

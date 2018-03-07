@@ -347,7 +347,7 @@ def dashboard_workspaces(request):
         'user_data': detailed_user_workspaces,
         'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.WORKSPACE,
         'template': dashboard_constants.DASHBOARD_WORKSPACES_TEMPLATE_TABLE,
-        'number_columns': 5,
+        'number_columns': 6,
         'create_workspace': True
     }
 
