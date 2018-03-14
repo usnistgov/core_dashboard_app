@@ -15,6 +15,7 @@ from core_main_app.components.user import api as user_api
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.utils.access_control.exceptions import AccessControlError
 from core_main_app.utils.rendering import admin_render
+from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 from core_main_app.views.user.forms import WorkspaceForm
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
@@ -195,25 +196,23 @@ def dashboard_templates(request):
                     'number_columns': 4, 'menu': True})
 
     modals = [
-                "core_main_app/admin/templates/list/modals/edit.html",
-                "core_main_app/admin/templates/list/modals/disable.html"
+                "core_main_app/admin/templates/list/modals/disable.html",
+                EditTemplateVersionManagerView.get_modal_html_path()
             ]
 
     assets = {
         "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
-        "js": [{
-                    "path": 'core_main_app/common/js/templates/list/restore.js',
-                    "is_raw": False
-                },
+        "js":[
                 {
-                    "path": 'core_main_app/common/js/templates/list/modals/edit.js',
+                    "path": 'core_main_app/common/js/templates/list/restore.js',
                     "is_raw": False
                 },
                 {
                     "path": 'core_main_app/common/js/templates/list/modals/disable.js',
                     "is_raw": False
-                }]
+                },
+                EditTemplateVersionManagerView.get_modal_js_path()]
     }
 
     _handle_asset_modals(assets,
@@ -265,25 +264,23 @@ def dashboard_types(request):
                         'menu': True})
 
     modals = [
-                "core_main_app/admin/templates/list/modals/edit.html",
-                "core_main_app/admin/templates/list/modals/disable.html"
+                "core_main_app/admin/templates/list/modals/disable.html",
+                EditTemplateVersionManagerView.get_modal_html_path()
             ]
 
     assets = {
         "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
 
-        "js": [{
-                    "path": 'core_main_app/common/js/templates/list/restore.js',
-                    "is_raw": False
-                },
-                {
-                    "path": 'core_main_app/common/js/templates/list/modals/edit.js',
-                    "is_raw": False
-                },
-                {
-                    "path": 'core_main_app/common/js/templates/list/modals/disable.js',
-                    "is_raw": False
-                }]
+        "js": [
+            {
+                "path": 'core_main_app/common/js/templates/list/restore.js',
+                "is_raw": False
+            },
+            {
+                "path": 'core_main_app/common/js/templates/list/modals/disable.js',
+                "is_raw": False
+            },
+            EditTemplateVersionManagerView.get_modal_js_path()]
     }
 
     _handle_asset_modals(assets,

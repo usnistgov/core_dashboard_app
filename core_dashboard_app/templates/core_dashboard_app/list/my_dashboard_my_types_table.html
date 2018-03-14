@@ -29,15 +29,15 @@
                             <a class="btn btn-default view-{{data.document}}-btn" href="{% url 'admin:core_composer_app_manage_type_versions' object.type_version.id %}">
                                 <i class="fa fa-list"></i> Versions
                             </a>
+                            {% url 'admin:core_dashboard_app_edit_type' object.type_version.id as edit_url %}
+                            {% include 'core_main_app/common/buttons/edit.html' %}
                         {% else %}
                             <a class="btn btn-default view-{{data.document}}-btn" href="{% url 'core_composer_app_manage_type_versions' object.type_version.id %}">
                                 <i class="fa fa-list"></i> Versions
                             </a>
+                            {% url 'core_dashboard_app_edit_type' object.type_version.id as edit_url %}
+                            {% include 'core_main_app/common/buttons/edit.html' %}
                         {% endif %}
-                        <a class="btn btn-default edit-template-btn" objectid="{{ object.type_version.id }}">
-                            <i class="fa fa-edit"></i> Edit
-                        </a>
-
                         <a class="btn btn-default disable-template-btn" objectid="{{ object.type_version.id }}">
                             <i class="fa fa-trash"></i> Disable
                         </a>

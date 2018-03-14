@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from core_dashboard_app.views.common import ajax, views as common_views
 from core_dashboard_app.views.common.views import UserDashboardPasswordChangeFormView
 from core_dashboard_app.views.user import views as user_views
+from core_main_app.views.common.ajax import EditTemplateVersionManagerView
+from django.core.urlresolvers import reverse_lazy
 
 urlpatterns = [
 
@@ -30,6 +32,11 @@ urlpatterns = [
     url(r'^files$', user_views.dashboard_files, name='core_dashboard_files'),
     url(r'^workspaces$', user_views.dashboard_workspaces, name='core_dashboard_workspaces'),
     url(r'^workspace-list-records/(?P<workspace_id>\w+)$', user_views.dashboard_workspace_records,
-        name='core_dashboard_workspace_list_data')
-
+        name='core_dashboard_workspace_list_data'),
+    url(r'^template/(?P<pk>[\w-]+)/edit/$',
+        EditTemplateVersionManagerView.as_view(success_url=reverse_lazy("core_dashboard_templates")),
+        name='core_dashboard_app_edit_template'),
+    url(r'^type/(?P<pk>[\w-]+)/edit/$',
+        EditTemplateVersionManagerView.as_view(success_url=reverse_lazy("core_dashboard_types")),
+        name='core_dashboard_app_edit_type'),
 ]
