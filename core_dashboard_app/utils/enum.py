@@ -1,5 +1,4 @@
-"""
-    Enumeration
+""" Enumeration
 """
 
 
