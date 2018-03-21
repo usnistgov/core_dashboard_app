@@ -1,4 +1,5 @@
-core_dashboard_app
+==================
+Core Dashboard App
 ==================
 
 Resource management via a dashboard for the curator core project.
