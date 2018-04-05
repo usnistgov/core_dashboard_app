@@ -25,6 +25,9 @@ from core_main_app.utils.rendering import render
 from core_main_app.views.admin.forms import EditProfileForm
 from core_main_app.views.common.views import CommonView
 from core_main_app.components.blob import api as blob_api, utils as blob_utils
+from core_main_app.components.template import api as template_api
+from core_main_app.components.template_version_manager import api as template_version_manager_api
+from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 from core_main_app.settings import INSTALLED_APPS
 if 'core_curate_app' in INSTALLED_APPS:
     import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
@@ -519,6 +522,73 @@ class DashboardForms(CommonView):
                 "path": dashboard_constants.JS_USER_SELECTED_ELEMENT,
                 "is_raw": True
             })
+
+        return self.common_render(request, self.template,
+                                  context=context,
+                                  assets=assets,
+                                  modals=modals)
+
+
+class DashboardTemplates(CommonView):
+    """ List the templates.
+    """
+
+    template = dashboard_constants.DASHBOARD_TEMPLATE
+
+    def get(self, request, *args, **kwargs):
+        """ Method GET
+
+        Args:
+            request:
+            args:
+            kwargs:
+
+        Returns:
+        """
+        # Get templates
+        if self.administration:
+            template_versions = template_version_manager_api.get_all()
+        else:
+            template_versions = template_version_manager_api.get_all_by_user_id(request.user.id)
+
+        detailed_templates = []
+        for template_version in template_versions:
+            # If the version manager doesn't have a user, the template is global.
+            if template_version.user is not None:
+                detailed_templates.append({'template_version': template_version,
+                                           'template': template_api.get(template_version.current),
+                                           'user': user_api.get_user_by_id(template_version.user).username,
+                                           'title': template_version.title
+                                           })
+
+        context = {
+            'user_data': detailed_templates,
+            'user_form': UserForm(request.user),
+            'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TEMPLATE,
+            'object_name': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TEMPLATE,
+            'template': dashboard_constants.DASHBOARD_TEMPLATES_TEMPLATE_TABLE,
+            'menu': False
+        }
+
+        modals = [
+                    "core_main_app/admin/templates/list/modals/disable.html",
+                    EditTemplateVersionManagerView.get_modal_html_path()
+                ]
+
+        assets = {
+            "css": dashboard_constants.CSS_COMMON,
+
+            "js": [
+                {
+                    "path": 'core_main_app/common/js/templates/list/restore.js',
+                    "is_raw": False
+                },
+                {
+                    "path": 'core_main_app/common/js/templates/list/modals/disable.js',
+                    "is_raw": False
+                },
+                EditTemplateVersionManagerView.get_modal_js_path()]
+        }
 
         return self.common_render(request, self.template,
                                   context=context,

@@ -11,8 +11,6 @@ import core_main_app.components.data.api as workspace_data_api
 import core_main_app.components.workspace.api as workspace_api
 from core_dashboard_app import constants as dashboard_constants
 from core_dashboard_app.views.common.forms import ActionForm, UserForm
-from core_main_app.components.template import api as template_api
-from core_main_app.components.template_version_manager import api as template_version_manager_api
 from core_main_app.components.user import api as user_api
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.utils.access_control.exceptions import AccessControlError
@@ -96,73 +94,6 @@ def dashboard_workspace_records(request, workspace_id):
 
     _handle_asset_modals(assets, modals, delete=True, change_owner=True, menu=False,
                          workspace=workspace.title)
-
-    return admin_render(request, dashboard_constants.ADMIN_DASHBOARD_TEMPLATE,
-                        context=context,
-                        assets=assets,
-                        modals=modals)
-
-
-@login_required(login_url=reverse_lazy("core_main_app_login"))
-def dashboard_templates(request):
-    """ List the templates.
-
-    Args:
-        request:
-
-    Return:
-    """
-
-    # Add user_form for change owner
-    user_form = UserForm(request.user)
-    context = {
-        'user_form': user_form,
-        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TEMPLATE,
-        'object_name': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TEMPLATE,
-        'template': dashboard_constants.DASHBOARD_TEMPLATES_TEMPLATE_TABLE
-    }
-
-    # Get all templates from other users
-    other_template_versions = template_version_manager_api.get_all()
-
-    detailed_other_users_templates = []
-    for other_template_version in other_template_versions:
-
-        # If the version manager doesn't have a user, the template is global.
-        if other_template_version.user is not None:
-            detailed_other_users_templates.append({'template_version': other_template_version,
-                                                   'template': template_api.get(other_template_version.current),
-                                                   'user': user_api.get_user_by_id(other_template_version.user).username,
-                                                   'title': other_template_version.title})
-
-    context.update({'other_users_data': detailed_other_users_templates,
-                    'number_columns': 4, 'menu': True})
-
-    modals = [
-                "core_main_app/admin/templates/list/modals/disable.html",
-                EditTemplateVersionManagerView.get_modal_html_path()
-            ]
-
-    assets = {
-        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
-
-        "js":[
-                {
-                    "path": 'core_main_app/common/js/templates/list/restore.js',
-                    "is_raw": False
-                },
-                {
-                    "path": 'core_main_app/common/js/templates/list/modals/disable.js',
-                    "is_raw": False
-                },
-                EditTemplateVersionManagerView.get_modal_js_path()]
-    }
-
-    _handle_asset_modals(assets,
-                         modals,
-                         delete=False,
-                         change_owner=False,
-                         menu=True)
 
     return admin_render(request, dashboard_constants.ADMIN_DASHBOARD_TEMPLATE,
                         context=context,
