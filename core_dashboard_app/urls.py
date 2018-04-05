@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^records$', login_required(common_views.DashboardRecords.as_view()), name='core_dashboard_records'),
     url(r'^forms$', login_required(common_views.DashboardForms.as_view()), name='core_dashboard_forms'),
     url(r'^templates$', login_required(common_views.DashboardTemplates.as_view()), name='core_dashboard_templates'),
-    url(r'^types$', user_views.dashboard_types, name='core_dashboard_types'),
+    url(r'^types$',login_required(common_views.DashboardTypes.as_view()), name='core_dashboard_types'),
     url(r'^files$', login_required(common_views.DashboardFiles.as_view()), name='core_dashboard_files'),
     url(r'^workspaces$', user_views.dashboard_workspaces, name='core_dashboard_workspaces'),
     url(r'^workspace-list-records/(?P<workspace_id>\w+)$', user_views.dashboard_workspace_records,

@@ -15,11 +15,7 @@ from core_main_app.components.user import api as user_api
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.utils.access_control.exceptions import AccessControlError
 from core_main_app.utils.rendering import render
-from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 from core_main_app.views.user.forms import WorkspaceForm
-if 'core_composer_app' in INSTALLED_APPS:
-    from core_composer_app.components.type_version_manager import api as type_version_manager_api
-    from core_composer_app.components.type import api as type_api
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
@@ -94,65 +90,6 @@ def dashboard_workspace_records(request, workspace_id):
 
     _handle_asset_modals(assets, modals, delete=True, change_owner=True, menu=False,
                          workspace=workspace.title)
-
-    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
-                  context=context,
-                  assets=assets,
-                  modals=modals)
-
-
-@login_required(login_url=reverse_lazy("core_main_app_login"))
-def dashboard_types(request):
-    """ List the types.
-
-    Args:
-        request:
-    Return:
-    """
-
-    # Get user types
-    user_type_versions = type_version_manager_api.get_version_managers_by_user(request.user.id)
-    detailed_user_type = []
-    for user_type_version in user_type_versions:
-        detailed_user_type.append({'type_version': user_type_version,
-                                   'type': type_api.get(user_type_version.current),
-                                   'user': request.user.username,
-                                   'title': user_type_version.title})
-
-    # Add user_form for change owner
-    user_form = UserForm(request.user)
-    context = {
-        'user_data': detailed_user_type,
-        'user_form': user_form,
-        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TYPE,
-        'object_name': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TYPE,
-        'template': dashboard_constants.DASHBOARD_TYPES_TEMPLATE_TABLE
-    }
-
-    modals = [
-                "core_main_app/admin/templates/list/modals/disable.html",
-                EditTemplateVersionManagerView.get_modal_html_path()
-             ]
-
-    assets = {
-        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
-
-        "js": [
-            {
-                "path": 'core_main_app/common/js/templates/list/restore.js',
-                "is_raw": False
-            },
-            {
-                "path": 'core_main_app/common/js/templates/list/modals/disable.js',
-                "is_raw": False
-            },
-            EditTemplateVersionManagerView.get_modal_js_path()]
-    }
-
-    _handle_asset_modals(assets, modals,
-                         delete=False,
-                         change_owner=False,
-                         menu=True)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,

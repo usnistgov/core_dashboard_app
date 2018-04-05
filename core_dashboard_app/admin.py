@@ -25,7 +25,10 @@ admin_urls = [
         administration=True,
         template=dashboard_constants.ADMIN_DASHBOARD_TEMPLATE)),
         name='core_dashboard_templates'),
-    url(r'^dashboard-types$', admin_views.dashboard_types, name='core_dashboard_types'),
+    url(r'^dashboard-types$', staff_member_required(common_views.DashboardTypes.as_view(
+        administration=True,
+        template=dashboard_constants.ADMIN_DASHBOARD_TEMPLATE)),
+        name='core_dashboard_types'),
     url(r'^files$', staff_member_required(common_views.DashboardFiles.as_view(
         administration=True,
         template=dashboard_constants.ADMIN_DASHBOARD_TEMPLATE)),

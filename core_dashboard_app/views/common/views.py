@@ -31,6 +31,9 @@ from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 from core_main_app.settings import INSTALLED_APPS
 if 'core_curate_app' in INSTALLED_APPS:
     import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
+if 'core_composer_app' in INSTALLED_APPS:
+    from core_composer_app.components.type_version_manager import api as type_version_manager_api
+    from core_composer_app.components.type import api as type_api
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
@@ -574,6 +577,74 @@ class DashboardTemplates(CommonView):
                     "core_main_app/admin/templates/list/modals/disable.html",
                     EditTemplateVersionManagerView.get_modal_html_path()
                 ]
+
+        assets = {
+            "css": dashboard_constants.CSS_COMMON,
+
+            "js": [
+                {
+                    "path": 'core_main_app/common/js/templates/list/restore.js',
+                    "is_raw": False
+                },
+                {
+                    "path": 'core_main_app/common/js/templates/list/modals/disable.js',
+                    "is_raw": False
+                },
+                EditTemplateVersionManagerView.get_modal_js_path()]
+        }
+
+        return self.common_render(request, self.template,
+                                  context=context,
+                                  assets=assets,
+                                  modals=modals)
+
+
+class DashboardTypes(CommonView):
+    """ List the types.
+    """
+
+    template = dashboard_constants.DASHBOARD_TEMPLATE
+
+    def get(self, request, *args, **kwargs):
+        """ Method GET
+
+        Args:
+            request:
+            args:
+            kwargs:
+
+        Returns:
+        """
+
+        # Get types
+        if self.administration:
+            type_versions = type_version_manager_api.get_all_version_manager()
+        else:
+            type_versions = type_version_manager_api.get_version_managers_by_user(request.user.id)
+
+        detailed_types = []
+        for type_version in type_versions:
+
+            # If the version manager doesn't have a user, the type is global.
+            if type_version.user is not None:
+                detailed_types.append({'type_version': type_version,
+                                       'type': type_api.get(type_version.current),
+                                       'user': user_api.get_user_by_id(type_version.user).username,
+                                       'title': type_version.title})
+
+        context = {
+            'user_form': UserForm(request.user),
+            'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TYPE,
+            'object_name': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.TYPE,
+            'template': dashboard_constants.DASHBOARD_TYPES_TEMPLATE_TABLE,
+            'menu': False,
+            'user_data': detailed_types
+        }
+
+        modals = [
+            "core_main_app/admin/templates/list/modals/disable.html",
+            EditTemplateVersionManagerView.get_modal_html_path()
+        ]
 
         assets = {
             "css": dashboard_constants.CSS_COMMON,
