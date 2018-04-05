@@ -4,12 +4,13 @@
 
 import copy
 
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse_lazy
+
 import core_main_app.components.data.api as workspace_data_api
-import core_main_app.components.version_manager.api as version_manager_api
 import core_main_app.components.workspace.api as workspace_api
-from core_dashboard_app.views.common.forms import ActionForm, UserForm
-from core_main_app.components.blob import api as blob_api, utils as blob_utils
-from core_main_app.components.data import api as data_api
+from core_dashboard_app import constants as dashboard_constants
+from core_dashboard_app.views.common.forms import UserForm
 from core_main_app.components.template import api as template_api
 from core_main_app.components.template_version_manager import api as template_version_manager_api
 from core_main_app.components.user import api as user_api
@@ -18,15 +19,9 @@ from core_main_app.utils.access_control.exceptions import AccessControlError
 from core_main_app.utils.rendering import render
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 from core_main_app.views.user.forms import WorkspaceForm
-from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse_lazy
-
-from core_dashboard_app import constants as dashboard_constants
 if 'core_composer_app' in INSTALLED_APPS:
     from core_composer_app.components.type_version_manager import api as type_version_manager_api
     from core_composer_app.components.type import api as type_api
-if 'core_curate_app' in INSTALLED_APPS:
-    import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
 
 
 @login_required(login_url=reverse_lazy("core_main_app_login"))
@@ -101,48 +96,6 @@ def dashboard_workspace_records(request, workspace_id):
 
     _handle_asset_modals(assets, modals, delete=True, change_owner=True, menu=False,
                          workspace=workspace.title)
-
-    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
-                  context=context,
-                  assets=assets,
-                  modals=modals)
-
-
-@login_required(login_url=reverse_lazy("core_main_app_login"))
-def dashboard_forms(request):
-    """ List the forms.
-
-    Args:
-         request:
-
-    Return:
-    """
-
-    # Get the forms
-    forms = curate_data_structure_api.get_all_by_user_id_with_no_data(request.user.id)
-
-    # User Form
-    user_form = UserForm(request.user)
-
-    detailed_forms = []
-    for form in forms:
-        detailed_forms.append({'form': form})
-
-    context = {'user_data': detailed_forms,
-               'user_form': user_form,
-               'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FORM,
-               'template': dashboard_constants.DASHBOARD_FORMS_TEMPLATE_TABLE
-               }
-
-    modals = []
-
-    assets = {
-        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
-
-        "js": []
-    }
-
-    _handle_asset_modals(assets, modals, delete=True, change_owner=True, menu=True)
 
     return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
                   context=context,
@@ -262,48 +215,6 @@ def dashboard_types(request):
 
     _handle_asset_modals(assets, modals,
                          delete=False,
-                         change_owner=False,
-                         menu=True)
-
-    return render(request, dashboard_constants.DASHBOARD_TEMPLATE,
-                  context=context,
-                  assets=assets,
-                  modals=modals)
-
-
-@login_required(login_url=reverse_lazy("core_main_app_login"))
-def dashboard_files(request):
-    """ List the files.
-
-    Args:
-        request:
-    Return:
-    """
-    user_files = blob_api.get_all_by_user_id(request.user.id)
-    detailed_user_file = []
-    for user_file in user_files:
-        detailed_user_file.append({'user': request.user.username,
-                                   'date': user_file.id.generation_time,
-                                   'file': user_file,
-                                   'url': blob_utils.get_blob_download_uri(user_file, request)
-                                   })
-
-    context = {
-        'user_data': detailed_user_file,
-        'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE,
-        'template': dashboard_constants.DASHBOARD_FILES_TEMPLATE_TABLE
-    }
-
-    modals = []
-
-    assets = {
-        "css": copy.deepcopy(dashboard_constants.CSS_COMMON),
-
-        "js": []
-    }
-
-    _handle_asset_modals(assets, modals,
-                         delete=True,
                          change_owner=False,
                          menu=True)
 
