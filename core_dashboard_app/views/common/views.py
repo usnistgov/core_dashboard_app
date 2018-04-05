@@ -17,18 +17,18 @@ from core_dashboard_app import settings
 from core_dashboard_app.views.common.forms import ActionForm, UserForm
 from core_main_app.components.blob import api as blob_api, utils as blob_utils
 from core_main_app.components.data import api as data_api
+from core_main_app.components.template import api as template_api
+from core_main_app.components.template_version_manager import api as template_version_manager_api
 from core_main_app.components.user import api as user_api
+from core_main_app.settings import INSTALLED_APPS
 from core_main_app.utils.access_control.exceptions import AccessControlError
 from core_main_app.utils.datetime_tools.date_time_encoder import DateTimeEncoder
 from core_main_app.utils.pagination.django_paginator.results_paginator import ResultsPaginator
 from core_main_app.utils.rendering import render
 from core_main_app.views.admin.forms import EditProfileForm
-from core_main_app.views.common.views import CommonView
-from core_main_app.components.blob import api as blob_api, utils as blob_utils
-from core_main_app.components.template import api as template_api
-from core_main_app.components.template_version_manager import api as template_version_manager_api
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
-from core_main_app.settings import INSTALLED_APPS
+from core_main_app.views.common.views import CommonView
+
 if 'core_curate_app' in INSTALLED_APPS:
     import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
 if 'core_composer_app' in INSTALLED_APPS:
@@ -492,34 +492,35 @@ class DashboardForms(CommonView):
                             'action_form': ActionForm(
                                 [('1', 'Delete selected forms'), ('2', 'Change owner of selected forms')]),
                             })
-            assets['js'].append({
-                "path": 'core_dashboard_app/common/js/init_pagination.js',
-                "is_raw": False
-            })
-            assets['js'].append({
-                "path": dashboard_constants.JS_ADMIN_ACTION_DASHBOARD,
-                "is_raw": True
-            })
-            assets['js'].append({
-                "path": dashboard_constants.JS_ADMIN_COUNT_CHECK,
-                "is_raw": True
-            })
-            assets['js'].append({
-                "path": dashboard_constants.JS_ADMIN_RESET_CHECKBOX,
-                "is_raw": True
-            })
-            assets['js'].append({
-                "path": dashboard_constants.JS_ADMIN_SELECT_ALL,
-                "is_raw": True
-            })
-            assets['js'].append({
-                "path": dashboard_constants.JS_ADMIN_SELETED_ELEMENT,
-                "is_raw": False
-            })
-            assets['js'].append({
-                "path": dashboard_constants.JS_ADMIN_INIT_MENU,
-                "is_raw": False
-            })
+
+            assets['js'].extend([{
+                                    "path": 'core_dashboard_app/common/js/init_pagination.js',
+                                    "is_raw": False
+                                },
+                                {
+                                    "path": dashboard_constants.JS_ADMIN_ACTION_DASHBOARD,
+                                    "is_raw": True
+                                },
+                                {
+                                    "path": dashboard_constants.JS_ADMIN_COUNT_CHECK,
+                                    "is_raw": True
+                                },
+                                {
+                                    "path": dashboard_constants.JS_ADMIN_RESET_CHECKBOX,
+                                    "is_raw": True
+                                },
+                                {
+                                    "path": dashboard_constants.JS_ADMIN_SELECT_ALL,
+                                    "is_raw": True
+                                },
+                                {
+                                    "path": dashboard_constants.JS_ADMIN_SELETED_ELEMENT,
+                                    "is_raw": False
+                                },
+                                {
+                                    "path": dashboard_constants.JS_ADMIN_INIT_MENU,
+                                    "is_raw": False
+                                }])
         else:
             assets['js'].append({
                 "path": dashboard_constants.JS_USER_SELECTED_ELEMENT,

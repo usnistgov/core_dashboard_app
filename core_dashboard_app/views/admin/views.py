@@ -12,7 +12,6 @@ import core_main_app.components.workspace.api as workspace_api
 from core_dashboard_app import constants as dashboard_constants
 from core_dashboard_app.views.common.forms import UserForm
 from core_main_app.components.user import api as user_api
-from core_main_app.settings import INSTALLED_APPS
 from core_main_app.utils.access_control.exceptions import AccessControlError
 from core_main_app.utils.rendering import admin_render
 from core_main_app.views.user.forms import WorkspaceForm
