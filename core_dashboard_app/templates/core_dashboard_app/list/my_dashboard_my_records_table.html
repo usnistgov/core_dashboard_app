@@ -1,4 +1,5 @@
 {% load dict_key_extras %}
+{% load draft_extras %}
 <thead>
     {% if data.menu and not data.title %}
         <th> <input type="checkbox" id="select_all_{{group}}" onchange="selectAll(this, '{{group}}')"> </th>
@@ -26,6 +27,9 @@
                 <script>
                     document.write('{{ data_loaded.data.title }}'.replace(/\.[^/.]+$/, ""));
                 </script>
+                {% if data_loaded.data|has_draft %}
+                    , <text style="color: red;"> Draft</text>
+                {% endif %}
             </td>
             <td> {{ data_loaded.data.template.display_name }}
             </td>

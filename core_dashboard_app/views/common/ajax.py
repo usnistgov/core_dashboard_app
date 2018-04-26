@@ -9,8 +9,9 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServer
 import core_main_app.components.data.api as data_api
 import core_main_app.components.user.api as user_api
 from core_dashboard_app import constants
-from core_main_app.commons.exceptions import DoesNotExist
+from core_main_app.commons.exceptions import DoesNotExist, LockError
 from core_main_app.components.blob import api as blob_api
+from core_main_app.components.lock.api import is_object_locked
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.utils.access_control.exceptions import AccessControlError
 from core_main_app.components.workspace import api as workspace_api
@@ -370,24 +371,18 @@ def edit_record(request):
 
     try:
         # Check if a curate data structure already exists
-        curate_data_structure = curate_data_structure_api.get_by_user_id_and_template_id_and_name(
-                                                                                    user_id=str(request.user.id),
-                                                                                    template_id=str(data.template.id),
-                                                                                    name=data.title)
-        if curate_data_structure is not None:
-            curate_data_structure_api.delete(curate_data_structure)
+        curate_data_structure = curate_data_structure_api.get_by_data_id(data.id)
     except DoesNotExist:
-        pass
+        # Create a new curate data structure
+        curate_data_structure = CurateDataStructure(user=str(request.user.id),
+                                                    template=str(data.template.id),
+                                                    name=data.title,
+                                                    form_string=data.xml_content,
+                                                    data=data)
+        curate_data_structure = curate_data_structure_api.upsert(curate_data_structure)
     except Exception, e:
         return HttpResponseServerError({"A problem occurred while editing."}, status=500)
 
-    # Create a new curate data structure
-    curate_data_structure = CurateDataStructure(user=str(request.user.id),
-                                                template=str(data.template.id),
-                                                name=data.title,
-                                                form_string=data.xml_content,
-                                                data=data)
-    curate_data_structure = curate_data_structure_api.upsert(curate_data_structure)
-
-    return HttpResponse(json.dumps({'url': reverse("core_curate_enter_data", args=(curate_data_structure.id,))}),
+    return HttpResponse(json.dumps({'url': reverse("core_curate_enter_data",
+                                                   args=(curate_data_structure.id,))}),
                         content_type='application/javascript')
