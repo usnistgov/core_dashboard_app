@@ -25,6 +25,3 @@ if 'core_curate_app' in INSTALLED_APPS:
 
 # Menu
 DASHBOARD_MENU = getattr(settings, 'DASHBOARD_MENU', menu)
-
-# Number of records to display per page for pagination
-RECORD_PER_PAGE_PAGINATION = getattr(settings, 'RESULTS_PER_PAGE', 10)

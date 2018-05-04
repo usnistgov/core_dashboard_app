@@ -1,1 +1,0 @@
-var dashboardChangeOwnerUrl = "{% url 'core_dashboard_change_owner_document' %}";

@@ -1,3 +1,2 @@
-core-composer-app==1.0.0-beta2
-core-curate-app==1.0.0-beta2
+core-dashboard-common-app==1.0.0-alpha1
 core-main-app==1.0.0-beta2

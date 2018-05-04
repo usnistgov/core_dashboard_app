@@ -4,9 +4,9 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 
-from core_dashboard_app.views.common import ajax, views as common_views
-from core_dashboard_app.views.common.views import UserDashboardPasswordChangeFormView
-from core_dashboard_app.views.user import views as user_views
+from core_dashboard_common_app.views.common import ajax, views as common_views
+from core_dashboard_common_app.views.common.views import UserDashboardPasswordChangeFormView
+from core_dashboard_common_app.views.user import views as user_views
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 from django.core.urlresolvers import reverse_lazy
 
@@ -17,7 +17,7 @@ urlpatterns = [
     url(r'^my-profile$', common_views.my_profile, name='core_dashboard_profile'),
     url(r'^my-profile/edit$', common_views.my_profile_edit, name='core_dashboard_profile_edit'),
     url(r'^my-profile/change-password', UserDashboardPasswordChangeFormView.as_view(
-        template_name='core_dashboard_app/my_profile_change_password.html', success_url='/'),
+        template_name='core_dashboard_common_app/my_profile_change_password.html', success_url='/'),
         name='core_dashboard_profile_change_password'),
 
     url(r'^delete-document', ajax.delete_document, name='core_dashboard_delete_document'),
