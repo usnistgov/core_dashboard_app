@@ -33,7 +33,9 @@ admin_urls = [
         administration=True,
         template=dashboard_constants.ADMIN_DASHBOARD_TEMPLATE)),
         name='core_dashboard_files'),
-    url(r'^workspaces$', admin_views.dashboard_workspaces, name='core_dashboard_workspaces'),
+    url(r'^workspaces$', staff_member_required(common_views.DashboardWorkspaces.as_view(
+        administration=True,
+        template=dashboard_constants.ADMIN_DASHBOARD_TEMPLATE)), name='core_dashboard_workspaces'),
     url(r'^workspace-list-records/(?P<workspace_id>\w+)$', admin_views.dashboard_workspace_records,
         name='core_dashboard_workspace_list_data'),
     url(r'^dashboard-template/(?P<pk>[\w-]+)/edit/$',

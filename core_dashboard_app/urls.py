@@ -30,7 +30,8 @@ urlpatterns = [
     url(r'^templates$', login_required(common_views.DashboardTemplates.as_view()), name='core_dashboard_templates'),
     url(r'^types$',login_required(common_views.DashboardTypes.as_view()), name='core_dashboard_types'),
     url(r'^files$', login_required(common_views.DashboardFiles.as_view()), name='core_dashboard_files'),
-    url(r'^workspaces$', user_views.dashboard_workspaces, name='core_dashboard_workspaces'),
+    url(r'^workspaces$', login_required(common_views.DashboardWorkspaces.as_view(
+    ), login_url=reverse_lazy("core_main_app_login")), name='core_dashboard_workspaces'),
     url(r'^workspace-list-records/(?P<workspace_id>\w+)$', user_views.dashboard_workspace_records,
         name='core_dashboard_workspace_list_data'),
     url(r'^template/(?P<pk>[\w-]+)/edit/$',
