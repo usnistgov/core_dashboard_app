@@ -13,7 +13,7 @@ Menu.add_item(
 )
 
 Menu.add_item(
-    "dashboard", MenuItem(FUNCTIONAL_OBJECT_ENUM.RECORD.title(), reverse('core_dashboard_records'))
+    "dashboard", MenuItem('{0}s'.format(FUNCTIONAL_OBJECT_ENUM.RECORD.title()), reverse('core_dashboard_records'))
 )
 
 Menu.add_item(
@@ -25,7 +25,7 @@ Menu.add_item(
 )
 
 sharing_children = (
-    MenuItem('All {0}'.format(FUNCTIONAL_OBJECT_ENUM.RECORD.title()), reverse("admin:core_dashboard_records"),
+    MenuItem('All {0}s'.format(FUNCTIONAL_OBJECT_ENUM.RECORD.title()), reverse("admin:core_dashboard_records"),
              icon="list"),
     MenuItem('All {0}s'.format(FUNCTIONAL_OBJECT_ENUM.TEMPLATE.title()), reverse("admin:core_dashboard_templates"),
              icon="list"),
