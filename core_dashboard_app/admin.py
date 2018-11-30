@@ -1,14 +1,13 @@
 """
 Url router for the administration site
 """
+from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.urlresolvers import reverse_lazy
 
 from core_dashboard_common_app import constants as dashboard_constants
-from core_main_app.views.common.ajax import EditTemplateVersionManagerView
-from core_dashboard_common_app.views.admin import views as admin_views
 from core_dashboard_common_app.views.common import views as common_views
 
 admin_urls = [
@@ -36,8 +35,9 @@ admin_urls = [
     url(r'^workspaces$', staff_member_required(common_views.DashboardWorkspaces.as_view(
         administration=True,
         template=dashboard_constants.ADMIN_DASHBOARD_TEMPLATE)), name='core_dashboard_workspaces'),
-    url(r'^workspace-list-records/(?P<workspace_id>\w+)$', admin_views.DashboardWorkspaceRecords.as_view(
-        administration=True),
+    url(r'^workspace-list-records/(?P<workspace_id>\w+)$', common_views.DashboardWorkspaceRecords.as_view(
+        administration=True,
+        template=dashboard_constants.ADMIN_DASHBOARD_TEMPLATE),
         name='core_dashboard_workspace_list_data'),
     url(r'^dashboard-template/(?P<pk>[\w-]+)/edit/$',
         EditTemplateVersionManagerView.as_view(success_url=reverse_lazy(

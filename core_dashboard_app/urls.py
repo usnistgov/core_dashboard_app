@@ -1,14 +1,13 @@
 """
     Url router for the user dashboard
 """
+from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse_lazy
 
 from core_dashboard_common_app.views.common import ajax, views as common_views
 from core_dashboard_common_app.views.common.views import UserDashboardPasswordChangeFormView
-from core_dashboard_common_app.views.user import views as user_views
-from core_main_app.views.common.ajax import EditTemplateVersionManagerView
-from django.core.urlresolvers import reverse_lazy
 
 urlpatterns = [
 
@@ -32,7 +31,7 @@ urlpatterns = [
     url(r'^files$', login_required(common_views.DashboardFiles.as_view()), name='core_dashboard_files'),
     url(r'^workspaces$', login_required(common_views.DashboardWorkspaces.as_view(
     ), login_url=reverse_lazy("core_main_app_login")), name='core_dashboard_workspaces'),
-    url(r'^workspace-list-records/(?P<workspace_id>\w+)$', login_required(user_views.DashboardWorkspaceRecords.as_view(
+    url(r'^workspace-list-records/(?P<workspace_id>\w+)$', login_required(common_views.DashboardWorkspaceRecords.as_view(
     ), login_url=reverse_lazy("core_main_app_login")),
         name='core_dashboard_workspace_list_data'),
     url(r'^template/(?P<pk>[\w-]+)/edit/$',
