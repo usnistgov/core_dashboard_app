@@ -52,7 +52,7 @@ if 'core_curate_app' in INSTALLED_APPS:
                                   reverse("admin:core_dashboard_forms"), icon="list"),)
 
 Menu.add_item(
-    "user", MenuItem("My Profile", reverse('core_dashboard_profile'))
+    "user", MenuItem("My Profile", reverse('core_dashboard_profile'), icon="user")
 )
 
 Menu.add_item(
