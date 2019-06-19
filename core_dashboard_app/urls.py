@@ -1,13 +1,13 @@
 """
     Url router for the user dashboard
 """
-from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
 
 from core_dashboard_common_app.views.common import ajax, views as common_views
 from core_dashboard_common_app.views.common.views import UserDashboardPasswordChangeFormView
+from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 
 urlpatterns = [
 
