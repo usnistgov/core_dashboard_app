@@ -24,20 +24,42 @@ urlpatterns = [
     url(r'^edit-record', ajax.edit_record, name='core_dashboard_edit_record'),
 
     # User
-    url(r'^records$', login_required(common_views.DashboardRecords.as_view()), name='core_dashboard_records'),
-    url(r'^forms$', login_required(common_views.DashboardForms.as_view()), name='core_dashboard_forms'),
-    url(r'^templates$', login_required(common_views.DashboardTemplates.as_view()), name='core_dashboard_templates'),
-    url(r'^types$',login_required(common_views.DashboardTypes.as_view()), name='core_dashboard_types'),
-    url(r'^files$', login_required(common_views.DashboardFiles.as_view()), name='core_dashboard_files'),
-    url(r'^workspaces$', login_required(common_views.DashboardWorkspaces.as_view(
-    ), login_url=reverse_lazy("core_main_app_login")), name='core_dashboard_workspaces'),
-    url(r'^workspace-list-records/(?P<workspace_id>\w+)$', login_required(common_views.DashboardWorkspaceRecords.as_view(
-    ), login_url=reverse_lazy("core_main_app_login")),
+    url(r'^records$',
+        login_required(common_views.DashboardRecords.as_view(),
+                       login_url=reverse_lazy("core_main_app_login")),
+        name='core_dashboard_records'),
+    url(r'^forms$',
+        login_required(common_views.DashboardForms.as_view(),
+                       login_url=reverse_lazy("core_main_app_login")),
+        name='core_dashboard_forms'),
+    url(r'^templates$',
+        login_required(common_views.DashboardTemplates.as_view(),
+                       login_url=reverse_lazy("core_main_app_login")),
+        name='core_dashboard_templates'),
+    url(r'^types$',
+        login_required(common_views.DashboardTypes.as_view(),
+                       login_url=reverse_lazy("core_main_app_login")),
+        name='core_dashboard_types'),
+    url(r'^files$',
+        login_required(common_views.DashboardFiles.as_view(),
+                       login_url=reverse_lazy("core_main_app_login")),
+        name='core_dashboard_files'),
+    url(r'^workspaces$',
+        login_required(common_views.DashboardWorkspaces.as_view(),
+                       login_url=reverse_lazy("core_main_app_login")),
+        name='core_dashboard_workspaces'),
+    url(r'^workspace-list-records/(?P<workspace_id>\w+)$',
+        login_required(common_views.DashboardWorkspaceRecords.as_view(),
+                       login_url=reverse_lazy("core_main_app_login")),
         name='core_dashboard_workspace_list_data'),
     url(r'^template/(?P<pk>[\w-]+)/edit/$',
-        EditTemplateVersionManagerView.as_view(success_url=reverse_lazy("core_dashboard_templates")),
+        EditTemplateVersionManagerView.as_view(
+            success_url=reverse_lazy("core_dashboard_templates")
+        ),
         name='core_dashboard_app_edit_template'),
     url(r'^type/(?P<pk>[\w-]+)/edit/$',
-        EditTemplateVersionManagerView.as_view(success_url=reverse_lazy("core_dashboard_types")),
+        EditTemplateVersionManagerView.as_view(
+            success_url=reverse_lazy("core_dashboard_types")
+        ),
         name='core_dashboard_app_edit_type'),
 ]
