@@ -1,0 +1,32 @@
+<div>
+    <ul class="nav nav-tabs"role="tablist">
+        <li role="presentation" class="{% if data.tab == 'data' %} active {% endif %}">
+            <a id="tab_data_table" data-tab-value="data" aria-controls="profile" role="tab">
+                Data
+            </a>
+        </li>
+        <li role="presentation" class="{% if data.tab == 'file' %} active {% endif %}">
+            <a id="tab_file_table" data-tab-value="file" aria-controls="profile" role="tab">
+                Files
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        {% if data.user_data %}
+            {% if data.tab == 'data' %}
+                <div role="tabpanel" id="data_table" class="tab-pane {% if data.tab == 'data' %} active {% endif %}">
+                        {% include 'core_dashboard_app/common/list/my_dashboard_tabs_data_pagination.html' %}
+                </div>
+            {% endif %}
+            {% if data.tab == 'file' %}
+                <div role="tabpanel" id="file_table" class="tab-pane {% if data.tab == 'file' %} active {% endif %}">
+                        {% include 'core_dashboard_app/common/list/my_dashboard_tabs_file_pagination.html' %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="alert">
+                The collection is empty.
+            </div>
+        {% endif %}
+    </div>
+</div>

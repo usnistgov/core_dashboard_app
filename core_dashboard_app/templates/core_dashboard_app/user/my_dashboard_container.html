@@ -1,0 +1,12 @@
+<h1>{{data.title}}</h1>
+
+<a href="{% url 'core_dashboard_workspaces' %}" class="btn btn-default back-to-previous pull-right">
+     <i class="fa fa-arrow-left"></i> Previous page
+</a>
+
+{% block box_body %}
+    <div class="tab-content">
+        {% include data.template with objects=data.user_data group='user' %}
+    </div>
+{% endblock %}
+

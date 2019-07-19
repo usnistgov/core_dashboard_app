@@ -1,0 +1,7 @@
+.nav li:hover {
+    cursor: pointer;
+}
+
+.nav li a {
+    color: #474747;
+}
