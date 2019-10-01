@@ -13,6 +13,7 @@ from core_main_app.components.workspace import api as workspace_api
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.utils.pagination.django_paginator.results_paginator import ResultsPaginator
 from core_main_app.views.common.views import CommonView
+from core_main_app.access_control.exceptions import AccessControlError
 
 
 class DashboardWorkspaceTabs(CommonView):
@@ -31,12 +32,15 @@ class DashboardWorkspaceTabs(CommonView):
 
         context = {}
 
-        if tab_selected == "data":
-            items_to_render = workspace_data_api.get_all_by_workspace(workspace, request.user)
-            context.update({'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD})
-        elif tab_selected == "file":
-            items_to_render = workspace_blob_api.get_all_by_workspace(workspace, request.user)
-            context.update({'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE})
+        try:
+            if tab_selected == "data":
+                items_to_render = workspace_data_api.get_all_by_workspace(workspace, request.user)
+                context.update({'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD})
+            elif tab_selected == "file":
+                items_to_render = workspace_blob_api.get_all_by_workspace(workspace, request.user)
+                context.update({'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE})
+        except AccessControlError as ace:
+            items_to_render = []
 
         user_can_read = workspace_api.can_user_read_workspace(workspace, request.user)
         user_can_write = workspace_api.can_user_write_workspace(workspace, request.user)
