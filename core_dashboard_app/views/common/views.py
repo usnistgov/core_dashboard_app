@@ -60,7 +60,7 @@ class DashboardWorkspaceTabs(CommonView):
         user_form = UserForm(request.user)
         context.update({
             'workspace_id': workspace_id,
-            'number_total': items_to_render.count,
+            'number_total': items_to_render.count(),
             'user_data': results_paginator,
             'user_form': user_form,
             'template': self.data_template,
