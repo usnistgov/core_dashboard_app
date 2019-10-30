@@ -1,7 +1,7 @@
 """
     User Dashboard menu
 """
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from menu import Menu, MenuItem
 
 from core_dashboard_app.settings import INSTALLED_APPS
