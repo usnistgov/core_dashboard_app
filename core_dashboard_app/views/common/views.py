@@ -35,10 +35,12 @@ class DashboardWorkspaceTabs(CommonView):
         try:
             if tab_selected == "data":
                 items_to_render = workspace_data_api.get_all_by_workspace(workspace, request.user)
-                context.update({'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD})
+                context.update(
+                    {'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD.value}
+                )
             elif tab_selected == "file":
                 items_to_render = workspace_blob_api.get_all_by_workspace(workspace, request.user)
-                context.update({'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE})
+                context.update({'document': dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE.value})
         except AccessControlError as ace:
             items_to_render = []
 
