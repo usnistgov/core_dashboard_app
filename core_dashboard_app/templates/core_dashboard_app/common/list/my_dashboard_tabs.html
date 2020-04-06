@@ -1,12 +1,18 @@
 <div>
     <ul class="nav nav-tabs"role="tablist">
-        <li role="presentation" class="{% if data.tab == 'data' %} active {% endif %}">
-            <a id="tab_data_table" data-tab-value="data" aria-controls="profile" role="tab">
+        <li role="presentation" class="nav-item">
+            <a class="nav-link{% if data.tab == 'data' %} active {% endif %}"
+               id="tab_data_table"
+               data-tab-value="data"
+               aria-controls="profile" role="tab">
                 Data
             </a>
         </li>
-        <li role="presentation" class="{% if data.tab == 'file' %} active {% endif %}">
-            <a id="tab_file_table" data-tab-value="file" aria-controls="profile" role="tab">
+        <li role="presentation" class="nav-item">
+            <a class="nav-link{% if data.tab == 'file' %} active {% endif %}"
+               id="tab_file_table"
+               data-tab-value="file"
+               aria-controls="profile" role="tab">
                 Files
             </a>
         </li>

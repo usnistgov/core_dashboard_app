@@ -3,7 +3,7 @@
 {% block box_title %}{{data.title}}{% endblock %}
 
 {% block box_tools %}
-    <a href="{% url 'admin:core_dashboard_workspaces' %}" class="btn btn-default back-to-previous">
+    <a href="{% url 'admin:core_dashboard_workspaces' %}" class="btn btn-secondary back-to-previous">
          <i class="fa fa-arrow-left"></i> Previous page
     </a>
 {% endblock %}
@@ -11,7 +11,7 @@
 {% block box_body %}
     {% if data.menu and not data.title %}
         <div class="dropdown" id="id_actions" style="display:none">
-            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 Choose action
                 <span class="caret"></span>
             </button>
