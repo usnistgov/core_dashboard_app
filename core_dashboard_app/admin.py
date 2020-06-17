@@ -84,15 +84,19 @@ admin_urls = [
     ),
     re_path(
         r"^dashboard-template/(?P<pk>[\w-]+)/edit/$",
-        EditTemplateVersionManagerView.as_view(
-            success_url=reverse_lazy("admin:core_dashboard_templates")
+        staff_member_required(
+            EditTemplateVersionManagerView.as_view(
+                success_url=reverse_lazy("admin:core_dashboard_templates")
+            )
         ),
         name="core_dashboard_app_edit_template",
     ),
     re_path(
         r"^dashboard-type/(?P<pk>[\w-]+)/edit/$",
-        EditTemplateVersionManagerView.as_view(
-            success_url=reverse_lazy("admin:core_dashboard_types")
+        staff_member_required(
+            EditTemplateVersionManagerView.as_view(
+                success_url=reverse_lazy("admin:core_dashboard_types")
+            )
         ),
         name="core_dashboard_app_edit_type",
     ),
