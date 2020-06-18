@@ -76,9 +76,11 @@ admin_urls = [
     ),
     re_path(
         r"^workspace/(?P<workspace_id>\w+)$",
-        dashboard_app_common_views.DashboardWorkspaceTabs.as_view(
-            administration=True,
-            template="core_dashboard_app/admin/my_dashboard_container.html",
+        staff_member_required(
+            dashboard_app_common_views.DashboardWorkspaceTabs.as_view(
+                administration=True,
+                template="core_dashboard_app/admin/my_dashboard_container.html",
+            )
         ),
         name="core_dashboard_workspace_list",
     ),
