@@ -19,8 +19,7 @@ from core_main_app.access_control.exceptions import AccessControlError
 
 
 class DashboardWorkspaceTabs(CommonView):
-    """ Workspace Tab Page
-    """
+    """Workspace Tab Page"""
 
     template = "core_dashboard_app/user/my_dashboard_container.html"
     data_template = "core_dashboard_app/common/list/my_dashboard_tabs.html"
