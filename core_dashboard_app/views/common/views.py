@@ -34,19 +34,18 @@ class DashboardWorkspaceTabs(CommonView):
         context = {}
 
         try:
+            data = workspace_data_api.get_all_by_workspace(workspace, request.user)
+            files = workspace_blob_api.get_all_by_workspace(workspace, request.user)
+
             if tab_selected == "data":
-                items_to_render = workspace_data_api.get_all_by_workspace(
-                    workspace, request.user
-                )
+                items_to_render = data
                 context.update(
                     {
                         "document": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD.value
                     }
                 )
             elif tab_selected == "file":
-                items_to_render = workspace_blob_api.get_all_by_workspace(
-                    workspace, request.user
-                )
+                items_to_render = files
                 context.update(
                     {"document": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE.value}
                 )
@@ -86,6 +85,8 @@ class DashboardWorkspaceTabs(CommonView):
                 ),
                 "tab": tab_selected,
                 "title": workspace.title,
+                "number_total_data": data.count(),
+                "number_total_files": files.count(),
             }
         )
 
