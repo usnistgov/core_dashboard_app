@@ -32,10 +32,13 @@ class DashboardWorkspaceTabs(CommonView):
         items_to_render = []
 
         context = {}
-
+        data_count = 0
+        files_count = 0
         try:
             data = workspace_data_api.get_all_by_workspace(workspace, request.user)
+            data_count = data.count()
             files = workspace_blob_api.get_all_by_workspace(workspace, request.user)
+            files_count = files.count()
 
             if tab_selected == "data":
                 items_to_render = data
@@ -50,7 +53,7 @@ class DashboardWorkspaceTabs(CommonView):
                     {"document": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE.value}
                 )
         except AccessControlError as ace:
-            items_to_render = []
+            items_to_render = workspace_data_api.get_none()
 
         user_can_read = workspace_api.can_user_read_workspace(workspace, request.user)
         user_can_write = workspace_api.can_user_write_workspace(workspace, request.user)
@@ -85,8 +88,8 @@ class DashboardWorkspaceTabs(CommonView):
                 ),
                 "tab": tab_selected,
                 "title": workspace.title,
-                "number_total_data": data.count(),
-                "number_total_files": files.count(),
+                "number_total_data": data_count,
+                "number_total_files": files_count,
             }
         )
 
