@@ -23,7 +23,7 @@ chdir(normpath(join(abspath(__file__), pardir)))
 
 setup(
     name="core_dashboard_app",
-    version="1.13.0",
+    version="1.14.0",
     description="Resource management via a dashboard for the curator core project",
     long_description=long_desc,
     author="NIST IT Lab",
