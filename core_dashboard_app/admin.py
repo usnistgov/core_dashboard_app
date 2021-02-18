@@ -65,6 +65,16 @@ admin_urls = [
         name="core_dashboard_files",
     ),
     re_path(
+        r"^queries$",
+        staff_member_required(
+            dashboard_common_app_common_views.DashboardQueries.as_view(
+                administration=True,
+                template=dashboard_constants.ADMIN_DASHBOARD_TEMPLATE,
+            )
+        ),
+        name="core_dashboard_queries",
+    ),
+    re_path(
         r"^workspaces$",
         staff_member_required(
             dashboard_common_app_common_views.DashboardWorkspaces.as_view(

@@ -87,6 +87,14 @@ urlpatterns = [
         name="core_dashboard_files",
     ),
     re_path(
+        r"^queries$",
+        login_required(
+            dashboard_common_app_common_views.DashboardQueries.as_view(),
+            login_url=reverse_lazy("core_main_app_login"),
+        ),
+        name="core_dashboard_queries",
+    ),
+    re_path(
         r"^workspaces$",
         login_required(
             dashboard_common_app_common_views.DashboardWorkspaces.as_view(),

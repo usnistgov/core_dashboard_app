@@ -30,6 +30,13 @@ Menu.add_item(
         reverse("core_dashboard_files"),
     ),
 )
+Menu.add_item(
+    "dashboard",
+    MenuItem(
+        "{0}".format(FUNCTIONAL_OBJECT_ENUM.QUERY.value.title()),
+        reverse("core_dashboard_queries"),
+    ),
+)
 
 Menu.add_item(
     "dashboard",
@@ -53,6 +60,11 @@ sharing_children = (
     MenuItem(
         "All {0}s".format(FUNCTIONAL_OBJECT_ENUM.FILE.value.title()),
         reverse("admin:core_dashboard_files"),
+        icon="list",
+    ),
+    MenuItem(
+        "All {0}".format(FUNCTIONAL_OBJECT_ENUM.QUERY.value.title()),
+        reverse("admin:core_dashboard_queries"),
         icon="list",
     ),
     MenuItem(

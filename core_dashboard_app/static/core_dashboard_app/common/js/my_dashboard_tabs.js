@@ -6,7 +6,7 @@
  * Update URL
  */
 redirect_to = function(tab, page) {
-    var url = urlResources;
+    var url = urlDocuments;
     // add the tab we are on
     url += "?tab=" + tab;
     // add the page number
