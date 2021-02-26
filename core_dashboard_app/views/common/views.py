@@ -2,6 +2,8 @@
 """
 import copy
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from core_dashboard_common_app import constants as dashboard_constants
 from core_dashboard_common_app import settings
 from core_dashboard_common_app.views.common.forms import UserForm
@@ -134,11 +136,15 @@ class DashboardWorkspaceTabs(CommonView):
             if tab_selected == "data":
                 document_context.update({"data": document, "is_owner": is_owner})
             elif tab_selected == "file":
+                try:
+                    username = user_api.get_user_by_id(document.user_id).username
+                except ObjectDoesNotExist:
+                    username = "None"
                 document_context.update(
                     {
                         "file": document,
                         "url": blob_utils.get_blob_download_uri(document, request),
-                        "user": user_api.get_user_by_id(document.user_id).username,
+                        "user": username,
                         "date": document.id.generation_time,
                         "is_owner": is_owner,
                     }
