@@ -21,7 +21,7 @@
         {% if data.user_data %}
             {% if data.tab == 'data' %}
                 <div role="tabpanel" id="data_table" class="tab-pane {% if data.tab == 'data' %} active {% endif %}">
-                        {% include 'core_dashboard_app/common/list/my_dashboard_tabs_data_pagination.html' %}
+                        {% include 'core_dashboard_common_app/list/my_dashboard_my_records_table_pagination.html' %}
                 </div>
             {% endif %}
             {% if data.tab == 'file' %}
