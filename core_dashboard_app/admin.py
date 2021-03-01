@@ -10,6 +10,7 @@ from core_dashboard_common_app import constants as dashboard_constants
 from core_dashboard_common_app.views.common import (
     views as dashboard_common_app_common_views,
 )
+from core_explore_common_app.views.user import ajax as user_ajax
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 
 admin_urls = [
@@ -73,6 +74,15 @@ admin_urls = [
             )
         ),
         name="core_dashboard_queries",
+    ),
+    re_path(
+        r"^query/(?P<persistent_query_type>\w+)/(?P<persistent_query_id>\w+)",
+        staff_member_required(
+            user_ajax.ContentPersistentQueryView.as_view(
+                administration=True,
+            )
+        ),
+        name="core_explore_common_persistent_query_content",
     ),
     re_path(
         r"^workspaces$",
