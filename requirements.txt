@@ -1,3 +1,2 @@
-Django==2.2.13
-django-password-policies==0.4.2
+Django==2.2.19
 django-simple-menu==1.2.1
