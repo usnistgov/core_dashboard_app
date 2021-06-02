@@ -80,6 +80,7 @@ admin_urls = [
         staff_member_required(
             user_ajax.ContentPersistentQueryView.as_view(
                 administration=True,
+                template="core_explore_common_app/admin/persistent_query/view_query_content.html",
             )
         ),
         name="core_explore_common_persistent_query_content",
