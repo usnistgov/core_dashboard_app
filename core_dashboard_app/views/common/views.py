@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from core_dashboard_common_app import constants as dashboard_constants
 from core_dashboard_common_app import settings
 from core_dashboard_common_app.views.common.forms import UserForm
+from core_main_app.access_control.exceptions import AccessControlError
 from core_main_app.components.blob import api as workspace_blob_api
 from core_main_app.components.blob import utils as blob_utils
 from core_main_app.components.data import api as workspace_data_api
@@ -17,7 +18,6 @@ from core_main_app.utils.pagination.django_paginator.results_paginator import (
     ResultsPaginator,
 )
 from core_main_app.views.common.views import CommonView
-from core_main_app.access_control.exceptions import AccessControlError
 
 
 class DashboardWorkspaceTabs(CommonView):
@@ -145,7 +145,7 @@ class DashboardWorkspaceTabs(CommonView):
                         "file": document,
                         "url": blob_utils.get_blob_download_uri(document, request),
                         "user": username,
-                        "date": document.id.generation_time,
+                        "date": document.creation_date,
                         "is_owner": is_owner,
                     }
                 )

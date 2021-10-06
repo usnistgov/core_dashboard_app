@@ -1,6 +1,5 @@
 """ Url router for the administration site
 """
-from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import re_path
 from django.urls import reverse_lazy
@@ -11,6 +10,7 @@ from core_dashboard_common_app.views.common import (
     views as dashboard_common_app_common_views,
 )
 from core_explore_common_app.views.user import ajax as user_ajax
+from core_main_app.admin import core_admin_site
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 
 admin_urls = [
@@ -109,7 +109,7 @@ admin_urls = [
         r"^dashboard-template/(?P<pk>[\w-]+)/edit/$",
         staff_member_required(
             EditTemplateVersionManagerView.as_view(
-                success_url=reverse_lazy("admin:core_dashboard_templates")
+                success_url=reverse_lazy("core-admin:core_dashboard_templates")
             )
         ),
         name="core_dashboard_app_edit_template",
@@ -118,12 +118,12 @@ admin_urls = [
         r"^dashboard-type/(?P<pk>[\w-]+)/edit/$",
         staff_member_required(
             EditTemplateVersionManagerView.as_view(
-                success_url=reverse_lazy("admin:core_dashboard_types")
+                success_url=reverse_lazy("core-admin:core_dashboard_types")
             )
         ),
         name="core_dashboard_app_edit_type",
     ),
 ]
 
-urls = admin.site.get_urls()
-admin.site.get_urls = lambda: admin_urls + urls
+urls = core_admin_site.get_urls()
+core_admin_site.get_urls = lambda: admin_urls + urls
