@@ -18,6 +18,7 @@ from core_main_app.utils.pagination.django_paginator.results_paginator import (
     ResultsPaginator,
 )
 from core_main_app.views.common.views import CommonView
+from core_main_app.commons import exceptions
 
 
 class DashboardWorkspaceTabs(CommonView):
@@ -27,16 +28,17 @@ class DashboardWorkspaceTabs(CommonView):
     data_template = "core_dashboard_app/common/list/my_dashboard_tabs.html"
 
     def get(self, request, workspace_id, *args, **kwargs):
-        workspace = workspace_api.get_by_id(workspace_id)
 
-        # Get the selected tab if given, otherwise data will be selected by default
-        tab_selected = request.GET.get("tab", "data")
-        items_to_render = []
-
-        context = {}
-        data_count = 0
-        files_count = 0
         try:
+            workspace = workspace_api.get_by_id(workspace_id)
+
+            # Get the selected tab if given, otherwise data will be selected by default
+            tab_selected = request.GET.get("tab", "data")
+            items_to_render = []
+
+            context = {}
+            data_count = 0
+            files_count = 0
             data = workspace_data_api.get_all_by_workspace(workspace, request.user)
             data_count = data.count()
             files = workspace_blob_api.get_all_by_workspace(workspace, request.user)
@@ -56,7 +58,26 @@ class DashboardWorkspaceTabs(CommonView):
                 )
         except AccessControlError as ace:
             items_to_render = workspace_data_api.get_none()
-
+        except exceptions.DoesNotExist:
+            error_message = "Workspace not found"
+            status_code = 404
+            return self.common_render(
+                request,
+                "core_main_app/common/commons/error.html",
+                context={
+                    "error": "Unable to access the requested workspace"
+                    + ": {}.".format(error_message),
+                    "status_code": status_code,
+                },
+                assets={
+                    "js": [
+                        {
+                            "path": "core_main_app/common/js/backtoprevious.js",
+                            "is_raw": True,
+                        }
+                    ]
+                },
+            )
         user_can_read = workspace_api.can_user_read_workspace(workspace, request.user)
         user_can_write = workspace_api.can_user_write_workspace(workspace, request.user)
 
