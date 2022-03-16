@@ -11,6 +11,7 @@ from core_dashboard_common_app.views.common import (
 )
 from core_explore_common_app.views.user import ajax as user_ajax
 from core_main_app.admin import core_admin_site
+from core_main_app.settings import INSTALLED_APPS
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 
 admin_urls = [
@@ -114,16 +115,23 @@ admin_urls = [
         ),
         name="core_dashboard_app_edit_template",
     ),
-    re_path(
-        r"^dashboard-type/(?P<pk>[\w-]+)/edit/$",
-        staff_member_required(
-            EditTemplateVersionManagerView.as_view(
-                success_url=reverse_lazy("core-admin:core_dashboard_types")
-            )
-        ),
-        name="core_dashboard_app_edit_type",
-    ),
 ]
+
+if "core_composer_app" in INSTALLED_APPS:
+    from core_composer_app.views.user.ajax import EditTypeVersionManagerView
+
+    admin_urls.append(
+        re_path(
+            r"^dashboard-type/(?P<pk>[\w-]+)/edit/$",
+            staff_member_required(
+                EditTypeVersionManagerView.as_view(
+                    success_url=reverse_lazy("core-admin:core_dashboard_types")
+                )
+            ),
+            name="core_dashboard_app_edit_type",
+        ),
+    )
+
 
 urls = core_admin_site.get_urls()
 core_admin_site.get_urls = lambda: admin_urls + urls

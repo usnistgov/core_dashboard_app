@@ -13,6 +13,7 @@ from core_dashboard_common_app.views.common import (
 from core_dashboard_common_app.views.common.views import (
     UserDashboardPasswordChangeFormView,
 )
+from core_main_app.settings import INSTALLED_APPS
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 
 urlpatterns = [
@@ -117,11 +118,18 @@ urlpatterns = [
         ),
         name="core_dashboard_app_edit_template",
     ),
-    re_path(
-        r"^type/(?P<pk>[\w-]+)/edit/$",
-        EditTemplateVersionManagerView.as_view(
-            success_url=reverse_lazy("core_dashboard_types")
-        ),
-        name="core_dashboard_app_edit_type",
-    ),
 ]
+
+
+if "core_composer_app" in INSTALLED_APPS:
+    from core_composer_app.views.user.ajax import EditTypeVersionManagerView
+
+    urlpatterns.append(
+        re_path(
+            r"^type/(?P<pk>[\w-]+)/edit/$",
+            EditTypeVersionManagerView.as_view(
+                success_url=reverse_lazy("core_dashboard_types")
+            ),
+            name="core_dashboard_app_edit_type",
+        ),
+    )
