@@ -31,6 +31,13 @@ class DashboardWorkspaceTabs(CommonView):
 
         try:
             workspace = workspace_api.get_by_id(workspace_id)
+            user_can_read = workspace_api.can_user_read_workspace(
+                workspace, request.user
+            )
+            if not user_can_read:
+                error_message = "Access Forbidden"
+                status_code = 403
+                return self._show_error(request, error_message, status_code)
 
             # Get the selected tab if given, otherwise data will be selected by default
             tab_selected = request.GET.get("tab", "data")
@@ -61,24 +68,8 @@ class DashboardWorkspaceTabs(CommonView):
         except exceptions.DoesNotExist:
             error_message = "Workspace not found"
             status_code = 404
-            return self.common_render(
-                request,
-                "core_main_app/common/commons/error.html",
-                context={
-                    "error": "Unable to access the requested workspace"
-                    + ": {}.".format(error_message),
-                    "status_code": status_code,
-                },
-                assets={
-                    "js": [
-                        {
-                            "path": "core_main_app/common/js/backtoprevious.js",
-                            "is_raw": True,
-                        }
-                    ]
-                },
-            )
-        user_can_read = workspace_api.can_user_read_workspace(workspace, request.user)
+            return self._show_error(request, error_message, status_code)
+
         user_can_write = workspace_api.can_user_write_workspace(workspace, request.user)
 
         # Paginator
@@ -226,3 +217,22 @@ class DashboardWorkspaceTabs(CommonView):
             )
 
         return assets
+
+    def _show_error(self, request, error_message, status_code):
+        return self.common_render(
+            request,
+            "core_main_app/common/commons/error.html",
+            context={
+                "error": "Unable to access the requested workspace"
+                + ": {}.".format(error_message),
+                "status_code": status_code,
+            },
+            assets={
+                "js": [
+                    {
+                        "path": "core_main_app/common/js/backtoprevious.js",
+                        "is_raw": True,
+                    }
+                ]
+            },
+        )
