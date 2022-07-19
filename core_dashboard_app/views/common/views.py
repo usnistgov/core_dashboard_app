@@ -8,6 +8,7 @@ from core_dashboard_common_app import constants as dashboard_constants
 from core_dashboard_common_app import settings
 from core_dashboard_common_app.views.common.forms import UserForm
 from core_main_app.access_control.exceptions import AccessControlError
+from core_main_app.commons import exceptions
 from core_main_app.components.blob import api as workspace_blob_api
 from core_main_app.components.blob import utils as blob_utils
 from core_main_app.components.data import api as workspace_data_api
@@ -18,7 +19,6 @@ from core_main_app.utils.pagination.django_paginator.results_paginator import (
     ResultsPaginator,
 )
 from core_main_app.views.common.views import CommonView
-from core_main_app.commons import exceptions
 
 
 class DashboardWorkspaceTabs(CommonView):
@@ -63,7 +63,7 @@ class DashboardWorkspaceTabs(CommonView):
                 context.update(
                     {"document": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE.value}
                 )
-        except AccessControlError as ace:
+        except AccessControlError:
             items_to_render = workspace_data_api.get_none()
         except exceptions.DoesNotExist:
             error_message = "Workspace not found"
