@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django.urls import re_path
 from django.urls import reverse_lazy
 
-from core_dashboard_app.views.common import views as dashboard_app_common_views
 from core_dashboard_common_app.views.common import (
     ajax,
     views as dashboard_common_app_common_views,
@@ -15,6 +14,7 @@ from core_dashboard_common_app.views.common.views import (
 )
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
+from core_dashboard_app.views.common import views as dashboard_app_common_views
 
 urlpatterns = [
     # Common

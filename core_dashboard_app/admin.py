@@ -4,7 +4,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import re_path
 from django.urls import reverse_lazy
 
-from core_dashboard_app.views.common import views as dashboard_app_common_views
 from core_dashboard_common_app import constants as dashboard_constants
 from core_dashboard_common_app.views.common import (
     views as dashboard_common_app_common_views,
@@ -13,6 +12,7 @@ from core_explore_common_app.views.user import ajax as user_ajax
 from core_main_app.admin import core_admin_site
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
+from core_dashboard_app.views.common import views as dashboard_app_common_views
 
 admin_urls = [
     # Admin

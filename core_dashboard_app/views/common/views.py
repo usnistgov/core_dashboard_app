@@ -27,7 +27,16 @@ class DashboardWorkspaceTabs(CommonView):
     template = "core_dashboard_app/user/my_dashboard_container.html"
     data_template = "core_dashboard_app/common/list/my_dashboard_tabs.html"
 
-    def get(self, request, workspace_id, *args, **kwargs):
+    def get(self, request, workspace_id):
+        """get workspace page
+
+        Args:
+            request:
+            workspace_id:
+
+        Returns:
+
+        """
 
         try:
             workspace = workspace_api.get_by_id(workspace_id)
@@ -223,8 +232,7 @@ class DashboardWorkspaceTabs(CommonView):
             request,
             "core_main_app/common/commons/error.html",
             context={
-                "error": "Unable to access the requested workspace"
-                + ": {}.".format(error_message),
+                "error": f"Unable to access the requested workspace: {error_message}.",
                 "status_code": status_code,
             },
             assets={

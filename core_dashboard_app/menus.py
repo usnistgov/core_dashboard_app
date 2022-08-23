@@ -4,9 +4,9 @@
 from django.urls import reverse
 from menu import Menu, MenuItem
 
-from core_dashboard_app.settings import INSTALLED_APPS
 from core_dashboard_common_app.constants import FUNCTIONAL_OBJECT_ENUM
 from core_dashboard_common_app.templatetags.special_plural import special_case_plural
+from core_dashboard_app.settings import INSTALLED_APPS
 
 Menu.add_item(
     "dashboard",
