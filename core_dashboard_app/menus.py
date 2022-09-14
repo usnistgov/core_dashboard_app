@@ -4,9 +4,9 @@
 from django.urls import reverse
 from menu import Menu, MenuItem
 
-from core_dashboard_app.settings import INSTALLED_APPS
 from core_dashboard_common_app.constants import FUNCTIONAL_OBJECT_ENUM
 from core_dashboard_common_app.templatetags.special_plural import special_case_plural
+from core_dashboard_app.settings import INSTALLED_APPS
 
 Menu.add_item(
     "dashboard",
@@ -50,27 +50,27 @@ Menu.add_item(
 sharing_children = (
     MenuItem(
         f"All {special_case_plural(FUNCTIONAL_OBJECT_ENUM.RECORD.value.title())}",
-        reverse("admin:core_dashboard_records"),
+        reverse("core-admin:core_dashboard_records"),
         icon="list",
     ),
     MenuItem(
         f"All {special_case_plural(FUNCTIONAL_OBJECT_ENUM.TEMPLATE.value.title())}",
-        reverse("admin:core_dashboard_templates"),
+        reverse("core-admin:core_dashboard_templates"),
         icon="list",
     ),
     MenuItem(
         f"All {special_case_plural(FUNCTIONAL_OBJECT_ENUM.FILE.value.title())}",
-        reverse("admin:core_dashboard_files"),
+        reverse("core-admin:core_dashboard_files"),
         icon="list",
     ),
     MenuItem(
         f"All {special_case_plural(FUNCTIONAL_OBJECT_ENUM.QUERY.value.title())}",
-        reverse("admin:core_dashboard_queries"),
+        reverse("core-admin:core_dashboard_queries"),
         icon="list",
     ),
     MenuItem(
         f"All {special_case_plural(FUNCTIONAL_OBJECT_ENUM.WORKSPACE.value.title())}",
-        reverse("admin:core_dashboard_workspaces"),
+        reverse("core-admin:core_dashboard_workspaces"),
         icon="list",
     ),
 )
@@ -86,7 +86,7 @@ if "core_composer_app" in INSTALLED_APPS:
     sharing_children += (
         MenuItem(
             f"All {special_case_plural(FUNCTIONAL_OBJECT_ENUM.TYPE.value.title())}",
-            reverse("admin:core_dashboard_types"),
+            reverse("core-admin:core_dashboard_types"),
             icon="list",
         ),
     )
@@ -102,7 +102,7 @@ if "core_curate_app" in INSTALLED_APPS:
     sharing_children += (
         MenuItem(
             f"All {special_case_plural(FUNCTIONAL_OBJECT_ENUM.FORM.value.title())}",
-            reverse("admin:core_dashboard_forms"),
+            reverse("core-admin:core_dashboard_forms"),
             icon="list",
         ),
     )

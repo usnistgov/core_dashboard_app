@@ -7,6 +7,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from core_dashboard_common_app import constants as dashboard_constants
 from core_dashboard_common_app import settings
 from core_dashboard_common_app.views.common.forms import UserForm
+from core_main_app.access_control.exceptions import AccessControlError
+from core_main_app.commons import exceptions
 from core_main_app.components.blob import api as workspace_blob_api
 from core_main_app.components.blob import utils as blob_utils
 from core_main_app.components.data import api as workspace_data_api
@@ -17,7 +19,6 @@ from core_main_app.utils.pagination.django_paginator.results_paginator import (
     ResultsPaginator,
 )
 from core_main_app.views.common.views import CommonView
-from core_main_app.access_control.exceptions import AccessControlError
 
 
 class DashboardWorkspaceTabs(CommonView):
@@ -26,17 +27,34 @@ class DashboardWorkspaceTabs(CommonView):
     template = "core_dashboard_app/user/my_dashboard_container.html"
     data_template = "core_dashboard_app/common/list/my_dashboard_tabs.html"
 
-    def get(self, request, workspace_id, *args, **kwargs):
-        workspace = workspace_api.get_by_id(workspace_id)
+    def get(self, request, workspace_id):
+        """get workspace page
 
-        # Get the selected tab if given, otherwise data will be selected by default
-        tab_selected = request.GET.get("tab", "data")
-        items_to_render = []
+        Args:
+            request:
+            workspace_id:
 
-        context = {}
-        data_count = 0
-        files_count = 0
+        Returns:
+
+        """
+
         try:
+            workspace = workspace_api.get_by_id(workspace_id)
+            user_can_read = workspace_api.can_user_read_workspace(
+                workspace, request.user
+            )
+            if not user_can_read:
+                error_message = "Access Forbidden"
+                status_code = 403
+                return self._show_error(request, error_message, status_code)
+
+            # Get the selected tab if given, otherwise data will be selected by default
+            tab_selected = request.GET.get("tab", "data")
+            items_to_render = []
+
+            context = {}
+            data_count = 0
+            files_count = 0
             data = workspace_data_api.get_all_by_workspace(workspace, request.user)
             data_count = data.count()
             files = workspace_blob_api.get_all_by_workspace(workspace, request.user)
@@ -54,10 +72,13 @@ class DashboardWorkspaceTabs(CommonView):
                 context.update(
                     {"document": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE.value}
                 )
-        except AccessControlError as ace:
+        except AccessControlError:
             items_to_render = workspace_data_api.get_none()
+        except exceptions.DoesNotExist:
+            error_message = "Workspace not found"
+            status_code = 404
+            return self._show_error(request, error_message, status_code)
 
-        user_can_read = workspace_api.can_user_read_workspace(workspace, request.user)
         user_can_write = workspace_api.can_user_write_workspace(workspace, request.user)
 
         # Paginator
@@ -145,7 +166,7 @@ class DashboardWorkspaceTabs(CommonView):
                         "file": document,
                         "url": blob_utils.get_blob_download_uri(document, request),
                         "user": username,
-                        "date": document.id.generation_time,
+                        "date": document.creation_date,
                         "is_owner": is_owner,
                     }
                 )
@@ -205,3 +226,21 @@ class DashboardWorkspaceTabs(CommonView):
             )
 
         return assets
+
+    def _show_error(self, request, error_message, status_code):
+        return self.common_render(
+            request,
+            "core_main_app/common/commons/error.html",
+            context={
+                "error": f"Unable to access the requested workspace: {error_message}.",
+                "status_code": status_code,
+            },
+            assets={
+                "js": [
+                    {
+                        "path": "core_main_app/common/js/backtoprevious.js",
+                        "is_raw": True,
+                    }
+                ]
+            },
+        )
