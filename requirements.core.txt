@@ -1,3 +1,3 @@
-core-main-app==2.0.0-beta2
-core-explore-common-app==2.0.0-beta2
-core-dashboard-common-app==2.0.0-beta2
+core-main-app==2.0.*
+core-explore-common-app==2.0.*
+core-dashboard-common-app==2.0.*
