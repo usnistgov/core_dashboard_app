@@ -18,7 +18,11 @@ from core_dashboard_app.views.common import views as dashboard_app_common_views
 
 urlpatterns = [
     # Common
-    re_path(r"^$", dashboard_common_app_common_views.home, name="core_dashboard_home"),
+    re_path(
+        r"^$",
+        dashboard_common_app_common_views.home,
+        name="core_dashboard_home",
+    ),
     re_path(
         r"^my-profile$",
         dashboard_common_app_common_views.my_profile,
@@ -38,14 +42,18 @@ urlpatterns = [
         name="core_dashboard_profile_change_password",
     ),
     re_path(
-        r"^delete-document", ajax.delete_document, name="core_dashboard_delete_document"
+        r"^delete-document",
+        ajax.delete_document,
+        name="core_dashboard_delete_document",
     ),
     re_path(
         r"^change-owner",
         ajax.change_owner_document,
         name="core_dashboard_change_owner_document",
     ),
-    re_path(r"^edit-record", ajax.edit_record, name="core_dashboard_edit_record"),
+    re_path(
+        r"^edit-record", ajax.edit_record, name="core_dashboard_edit_record"
+    ),
     # User
     re_path(
         r"^records$",

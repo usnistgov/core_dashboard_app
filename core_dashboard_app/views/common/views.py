@@ -55,9 +55,13 @@ class DashboardWorkspaceTabs(CommonView):
             context = {}
             data_count = 0
             files_count = 0
-            data = workspace_data_api.get_all_by_workspace(workspace, request.user)
+            data = workspace_data_api.get_all_by_workspace(
+                workspace, request.user
+            )
             data_count = data.count()
-            files = workspace_blob_api.get_all_by_workspace(workspace, request.user)
+            files = workspace_blob_api.get_all_by_workspace(
+                workspace, request.user
+            )
             files_count = files.count()
 
             if tab_selected == "data":
@@ -70,7 +74,9 @@ class DashboardWorkspaceTabs(CommonView):
             elif tab_selected == "file":
                 items_to_render = files
                 context.update(
-                    {"document": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE.value}
+                    {
+                        "document": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE.value
+                    }
                 )
         except AccessControlError:
             items_to_render = workspace_data_api.get_none()
@@ -79,7 +85,9 @@ class DashboardWorkspaceTabs(CommonView):
             status_code = 404
             return self._show_error(request, error_message, status_code)
 
-        user_can_write = workspace_api.can_user_write_workspace(workspace, request.user)
+        user_can_write = workspace_api.can_user_write_workspace(
+            workspace, request.user
+        )
 
         # Paginator
         page = request.GET.get("page", 1)
@@ -117,7 +125,9 @@ class DashboardWorkspaceTabs(CommonView):
         )
 
         # Get all username and corresponding ids
-        user_names = dict((str(x.id), x.username) for x in user_api.get_all_users())
+        user_names = dict(
+            (str(x.id), x.username) for x in user_api.get_all_users()
+        )
         context.update({"usernames": user_names})
 
         modals = [
@@ -136,35 +146,54 @@ class DashboardWorkspaceTabs(CommonView):
                     }
                 ]
             )
-            assets["css"].append("core_file_preview_app/user/css/file_preview.css")
+            assets["css"].append(
+                "core_file_preview_app/user/css/file_preview.css"
+            )
             modals.append("core_file_preview_app/user/file_preview_modal.html")
 
         return self.common_render(
-            request, self.template, context=context, assets=assets, modals=modals
+            request,
+            self.template,
+            context=context,
+            assets=assets,
+            modals=modals,
         )
 
     def _format_document_context(
-        self, request, document_list, user_can_read, user_can_write, tab_selected
+        self,
+        request,
+        document_list,
+        user_can_read,
+        user_can_write,
+        tab_selected,
     ):
         detailed_documents = []
         user = request.user
         for document in document_list:
-            is_owner = str(document.user_id) == str(user.id) or self.administration
+            is_owner = (
+                str(document.user_id) == str(user.id) or self.administration
+            )
             document_context = {
                 "can_read": user_can_read or is_owner,
                 "can_write": user_can_write or is_owner,
             }
             if tab_selected == "data":
-                document_context.update({"data": document, "is_owner": is_owner})
+                document_context.update(
+                    {"data": document, "is_owner": is_owner}
+                )
             elif tab_selected == "file":
                 try:
-                    username = user_api.get_user_by_id(document.user_id).username
+                    username = user_api.get_user_by_id(
+                        document.user_id
+                    ).username
                 except ObjectDoesNotExist:
                     username = "None"
                 document_context.update(
                     {
                         "file": document,
-                        "url": blob_utils.get_blob_download_uri(document, request),
+                        "url": blob_utils.get_blob_download_uri(
+                            document, request
+                        ),
                         "user": username,
                         "date": document.creation_date,
                         "is_owner": is_owner,
@@ -181,9 +210,15 @@ class DashboardWorkspaceTabs(CommonView):
                     "path": "core_main_app/user/js/workspaces/list/modals/assign_workspace.js",
                     "is_raw": False,
                 },
-                {"path": dashboard_constants.USER_VIEW_RECORD_RAW, "is_raw": True},
+                {
+                    "path": dashboard_constants.USER_VIEW_RECORD_RAW,
+                    "is_raw": True,
+                },
                 {"path": dashboard_constants.JS_EDIT_RECORD, "is_raw": False},
-                {"path": dashboard_constants.JS_USER_SELECTED_ELEMENT, "is_raw": False},
+                {
+                    "path": dashboard_constants.JS_USER_SELECTED_ELEMENT,
+                    "is_raw": False,
+                },
                 {"path": dashboard_constants.JS_VIEW_RECORD, "is_raw": False},
                 {
                     "path": "core_dashboard_common_app/user/js/init.raw.js",
@@ -208,7 +243,9 @@ class DashboardWorkspaceTabs(CommonView):
             ],
         }
 
-        assets["css"].append("core_dashboard_app/common/css/my_dashboard_tabs.css")
+        assets["css"].append(
+            "core_dashboard_app/common/css/my_dashboard_tabs.css"
+        )
 
         if self.administration:
             assets["js"].append(
