@@ -150,7 +150,8 @@ class DashboardWorkspaceTabs(CommonView):
                 "core_file_preview_app/user/css/file_preview.css"
             )
             modals.append("core_file_preview_app/user/file_preview_modal.html")
-
+        # Set page title
+        context.update({"page_title": "Dashboard"})
         return self.common_render(
             request,
             self.template,
@@ -271,6 +272,7 @@ class DashboardWorkspaceTabs(CommonView):
             context={
                 "error": f"Unable to access the requested workspace: {error_message}.",
                 "status_code": status_code,
+                "page_title": "Error",
             },
             assets={
                 "js": [
