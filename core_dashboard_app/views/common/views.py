@@ -220,6 +220,14 @@ class DashboardWorkspaceTabs(CommonView):
                     "path": dashboard_constants.JS_USER_SELECTED_ELEMENT,
                     "is_raw": False,
                 },
+                {
+                    "path": dashboard_constants.JS_OPEN_DOCUMENT,
+                    "is_raw": False,
+                },
+                {
+                    "path": "core_dashboard_common_app/common/js/list/open_record.raw.js",
+                    "is_raw": True,
+                },
                 {"path": dashboard_constants.JS_VIEW_RECORD, "is_raw": False},
                 {
                     "path": "core_dashboard_common_app/user/js/init.raw.js",
