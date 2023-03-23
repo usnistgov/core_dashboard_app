@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import re_path
 from django.urls import reverse_lazy
 
+from core_dashboard_app.views.common import views as dashboard_app_common_views
 from core_dashboard_common_app.views.common import (
     ajax,
     views as dashboard_common_app_common_views,
@@ -14,7 +15,6 @@ from core_dashboard_common_app.views.common.views import (
 )
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
-from core_dashboard_app.views.common import views as dashboard_app_common_views
 
 urlpatterns = [
     # Common
@@ -59,7 +59,6 @@ urlpatterns = [
         r"^records$",
         login_required(
             dashboard_common_app_common_views.DashboardRecords.as_view(),
-            login_url=reverse_lazy("core_main_app_login"),
         ),
         name="core_dashboard_records",
     ),
@@ -67,7 +66,6 @@ urlpatterns = [
         r"^forms$",
         login_required(
             dashboard_common_app_common_views.DashboardForms.as_view(),
-            login_url=reverse_lazy("core_main_app_login"),
         ),
         name="core_dashboard_forms",
     ),
@@ -75,7 +73,6 @@ urlpatterns = [
         r"^templates$",
         login_required(
             dashboard_common_app_common_views.DashboardTemplates.as_view(),
-            login_url=reverse_lazy("core_main_app_login"),
         ),
         name="core_dashboard_templates",
     ),
@@ -83,7 +80,6 @@ urlpatterns = [
         r"^types$",
         login_required(
             dashboard_common_app_common_views.DashboardTypes.as_view(),
-            login_url=reverse_lazy("core_main_app_login"),
         ),
         name="core_dashboard_types",
     ),
@@ -91,7 +87,6 @@ urlpatterns = [
         r"^files$",
         login_required(
             dashboard_common_app_common_views.DashboardFiles.as_view(),
-            login_url=reverse_lazy("core_main_app_login"),
         ),
         name="core_dashboard_files",
     ),
@@ -99,7 +94,6 @@ urlpatterns = [
         r"^queries$",
         login_required(
             dashboard_common_app_common_views.DashboardQueries.as_view(),
-            login_url=reverse_lazy("core_main_app_login"),
         ),
         name="core_dashboard_queries",
     ),
@@ -107,7 +101,6 @@ urlpatterns = [
         r"^workspaces$",
         login_required(
             dashboard_common_app_common_views.DashboardWorkspaces.as_view(),
-            login_url=reverse_lazy("core_main_app_login"),
         ),
         name="core_dashboard_workspaces",
     ),
@@ -115,7 +108,6 @@ urlpatterns = [
         r"^workspace/(?P<workspace_id>\w+)$",
         login_required(
             dashboard_app_common_views.DashboardWorkspaceTabs.as_view(),
-            login_url=reverse_lazy("core_main_app_login"),
         ),
         name="core_dashboard_workspace_list",
     ),
