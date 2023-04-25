@@ -3,6 +3,7 @@
 import copy
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 
 from core_dashboard_common_app import constants as dashboard_constants
 from core_dashboard_common_app import settings
@@ -37,9 +38,22 @@ class DashboardWorkspaceTabs(CommonView):
         Returns:
 
         """
+        # Initialize necessary variables
+        user_can_read = False
+
+        tab_selected = request.GET.get("tab", "data")
+        data_count = 0
+        files_count = 0
+        context = {}
 
         try:
             workspace = workspace_api.get_by_id(workspace_id)
+        except exceptions.DoesNotExist:
+            error_message = "Workspace not found"
+            status_code = 404
+            return self._show_error(request, error_message, status_code)
+
+        try:
             user_can_read = workspace_api.can_user_read_workspace(
                 workspace, request.user
             )
@@ -48,13 +62,8 @@ class DashboardWorkspaceTabs(CommonView):
                 status_code = 403
                 return self._show_error(request, error_message, status_code)
 
-            # Get the selected tab if given, otherwise data will be selected by default
-            tab_selected = request.GET.get("tab", "data")
+            # Figure out the items to render on the page
             items_to_render = []
-
-            context = {}
-            data_count = 0
-            files_count = 0
             data = workspace_data_api.get_all_by_workspace(
                 workspace, request.user
             )
@@ -80,10 +89,6 @@ class DashboardWorkspaceTabs(CommonView):
                 )
         except AccessControlError:
             items_to_render = workspace_data_api.get_none()
-        except exceptions.DoesNotExist:
-            error_message = "Workspace not found"
-            status_code = 404
-            return self._show_error(request, error_message, status_code)
 
         user_can_write = workspace_api.can_user_write_workspace(
             workspace, request.user
@@ -124,6 +129,16 @@ class DashboardWorkspaceTabs(CommonView):
             }
         )
 
+        if self.administration and workspace.owner:
+            context.update(
+                {
+                    "owner": user_api.get_user_by_id(workspace.owner).username,
+                    "owner_change_url": reverse(
+                        "admin:auth_user_change", args=[workspace.owner]
+                    ),
+                }
+            )
+
         # Get all username and corresponding ids
         user_names = dict(
             (str(x.id), x.username) for x in user_api.get_all_users()
@@ -150,6 +165,7 @@ class DashboardWorkspaceTabs(CommonView):
                 "core_file_preview_app/user/css/file_preview.css"
             )
             modals.append("core_file_preview_app/user/file_preview_modal.html")
+
         # Set page title
         context.update({"page_title": "Dashboard"})
         return self.common_render(

@@ -12,13 +12,27 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.sites",
     # Local apps
+    "core_main_app",
     "tests",
 ]
+
+# IN-MEMORY TEST DATABASE
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
+        "USER": "",
+        "PASSWORD": "",
+        "HOST": "",
+        "PORT": "",
+    },
+}
 
 MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "tz_detect.middleware.TimezoneMiddleware",
 )
 
 TEMPLATES = [
@@ -32,10 +46,17 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core_main_app.utils.custom_context_processors.domain_context_processor",
                 "django.template.context_processors.i18n",
             ],
         },
     },
 ]
+
+CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CUSTOM_NAME = "Curator"
+
 MONGODB_INDEXING = False
 MONGODB_ASYNC_SAVE = False
+
+ENABLE_SAML2_SSO_AUTH = False

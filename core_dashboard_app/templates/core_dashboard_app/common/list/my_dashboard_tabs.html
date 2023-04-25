@@ -1,5 +1,8 @@
 <div>
-    <ul class="nav nav-tabs"role="tablist">
+    {% if data.administration and data.owner %}
+        <p>Owner: <a href="{{ data.owner_change_url }}">{{ data.owner }}</a></p>
+    {% endif %}
+    <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="nav-item">
             <a class="nav-link{% if data.tab == 'data' %} active {% endif %}"
                id="tab_data_table"
