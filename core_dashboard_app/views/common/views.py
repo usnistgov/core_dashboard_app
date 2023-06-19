@@ -2,6 +2,7 @@
 """
 import copy
 
+from core_main_app.commons.exceptions import DoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
@@ -20,6 +21,9 @@ from core_main_app.utils.pagination.django_paginator.results_paginator import (
     ResultsPaginator,
 )
 from core_main_app.views.common.views import CommonView
+
+if "core_curate_app" in INSTALLED_APPS:
+    import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
 
 
 class DashboardWorkspaceTabs(CommonView):
@@ -195,8 +199,22 @@ class DashboardWorkspaceTabs(CommonView):
                 "can_write": user_can_write or is_owner,
             }
             if tab_selected == "data":
+                forms_count = (
+                    len(
+                        curate_data_structure_api.get_all_curate_data_structures_by_data(
+                            document, user
+                        )
+                    )
+                    if self.administration
+                    else 0
+                )
                 document_context.update(
-                    {"data": document, "is_owner": is_owner}
+                    {
+                        "data": document,
+                        "is_owner": is_owner,
+                        "form_id": self._get_form(document, user),
+                        "forms_count": forms_count,
+                    }
                 )
             elif tab_selected == "file":
                 try:
@@ -218,6 +236,14 @@ class DashboardWorkspaceTabs(CommonView):
                 )
             detailed_documents.append(document_context)
         return detailed_documents
+
+    def _get_form(self, data, user):
+        try:
+            return curate_data_structure_api.get_by_data_id_and_user(
+                data.id, user
+            ).id
+        except DoesNotExist:
+            return None
 
     def _get_assets(self):
         assets = {
@@ -263,6 +289,10 @@ class DashboardWorkspaceTabs(CommonView):
                 },
                 {
                     "path": "core_dashboard_app/common/js/my_dashboard_tabs.js",
+                    "is_raw": False,
+                },
+                {
+                    "path": "core_dashboard_common_app/common/js/list/delete_data_draft.js",
                     "is_raw": False,
                 },
             ],

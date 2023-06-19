@@ -11,8 +11,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.sites",
+    # Extra apps
+    "django_celery_beat",
     # Local apps
     "core_main_app",
+    "core_dashboard_common_app",
+    "core_dashboard_app",
+    "core_parser_app",
+    "core_curate_app",
+    "core_explore_common_app",
     "tests",
 ]
 
@@ -57,5 +64,5 @@ CUSTOM_NAME = "Curator"
 
 MONGODB_INDEXING = False
 MONGODB_ASYNC_SAVE = False
-
+ROOT_URLCONF = "tests.urls"
 ENABLE_SAML2_SSO_AUTH = False
