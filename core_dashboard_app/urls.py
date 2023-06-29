@@ -10,9 +10,6 @@ from core_dashboard_common_app.views.common import (
     ajax,
     views as dashboard_common_app_common_views,
 )
-from core_dashboard_common_app.views.common.views import (
-    UserDashboardPasswordChangeFormView,
-)
 from core_main_app.settings import INSTALLED_APPS
 from core_main_app.views.common.ajax import EditTemplateVersionManagerView
 
@@ -32,14 +29,6 @@ urlpatterns = [
         r"^my-profile/edit$",
         dashboard_common_app_common_views.my_profile_edit,
         name="core_dashboard_profile_edit",
-    ),
-    re_path(
-        r"^my-profile/change-password",
-        UserDashboardPasswordChangeFormView.as_view(
-            template_name="core_dashboard_common_app/my_profile_change_password.html",
-            success_url="/",
-        ),
-        name="core_dashboard_profile_change_password",
     ),
     re_path(
         r"^delete-document",
