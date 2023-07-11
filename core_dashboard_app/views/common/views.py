@@ -2,7 +2,6 @@
 """
 import copy
 
-from core_main_app.commons.exceptions import DoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
@@ -11,6 +10,7 @@ from core_dashboard_common_app import settings
 from core_dashboard_common_app.views.common.forms import UserForm
 from core_main_app.access_control.exceptions import AccessControlError
 from core_main_app.commons import exceptions
+from core_main_app.commons.exceptions import DoesNotExist
 from core_main_app.components.blob import api as workspace_blob_api
 from core_main_app.components.blob import utils as blob_utils
 from core_main_app.components.data import api as workspace_data_api
@@ -226,7 +226,8 @@ class DashboardWorkspaceTabs(CommonView):
                 document_context.update(
                     {
                         "file": document,
-                        "url": blob_utils.get_blob_download_uri(
+                        "url": f"{reverse('core_main_app_blob_detail')}?id={document.id}",
+                        "download_url": blob_utils.get_blob_download_uri(
                             document, request
                         ),
                         "user": username,
