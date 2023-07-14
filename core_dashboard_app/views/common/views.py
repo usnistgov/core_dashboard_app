@@ -2,6 +2,10 @@
 """
 import copy
 
+from core_main_app.components.workspace.api import (
+    check_if_workspace_can_be_changed,
+)
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
@@ -152,6 +156,7 @@ class DashboardWorkspaceTabs(CommonView):
         modals = [
             dashboard_constants.MODALS_COMMON_CHANGE_OWNER,
             dashboard_constants.MODALS_COMMON_DELETE,
+            "core_main_app/user/workspaces/list/modals/assign_workspace.html",
         ]
 
         assets = self._get_assets()
@@ -214,6 +219,9 @@ class DashboardWorkspaceTabs(CommonView):
                         "is_owner": is_owner,
                         "form_id": self._get_form(document, user),
                         "forms_count": forms_count,
+                        "can_change_workspace": check_if_workspace_can_be_changed(
+                            document
+                        ),
                     }
                 )
             elif tab_selected == "file":
@@ -253,6 +261,10 @@ class DashboardWorkspaceTabs(CommonView):
                 {
                     "path": "core_main_app/user/js/workspaces/list/modals/assign_workspace.js",
                     "is_raw": False,
+                },
+                {
+                    "path": "core_main_app/user/js/workspaces/list/modals/assign_data_workspace.raw.js",
+                    "is_raw": True,
                 },
                 {
                     "path": dashboard_constants.USER_VIEW_RECORD_RAW,
