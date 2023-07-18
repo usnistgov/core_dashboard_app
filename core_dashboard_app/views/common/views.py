@@ -10,7 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
 from core_dashboard_common_app import constants as dashboard_constants
-from core_dashboard_common_app import settings
 from core_dashboard_common_app.views.common.forms import UserForm
 from core_main_app.access_control.exceptions import AccessControlError
 from core_main_app.commons import exceptions
@@ -20,13 +19,13 @@ from core_main_app.components.blob import utils as blob_utils
 from core_main_app.components.data import api as workspace_data_api
 from core_main_app.components.user import api as user_api
 from core_main_app.components.workspace import api as workspace_api
-from core_main_app.settings import INSTALLED_APPS
+from django.conf import settings
 from core_main_app.utils.pagination.django_paginator.results_paginator import (
     ResultsPaginator,
 )
 from core_main_app.views.common.views import CommonView
 
-if "core_curate_app" in INSTALLED_APPS:
+if "core_curate_app" in settings.INSTALLED_APPS:
     import core_curate_app.components.curate_data_structure.api as curate_data_structure_api
 
 
@@ -105,7 +104,9 @@ class DashboardWorkspaceTabs(CommonView):
         # Paginator
         page = request.GET.get("page", 1)
         results_paginator = ResultsPaginator.get_results(
-            items_to_render, page, settings.RECORD_PER_PAGE_PAGINATION
+            items_to_render,
+            page,
+            settings.RECORD_PER_PAGE_PAGINATION,
         )
 
         # Data context
@@ -134,6 +135,8 @@ class DashboardWorkspaceTabs(CommonView):
                 "title": workspace.title,
                 "number_total_data": data_count,
                 "number_total_files": files_count,
+                "share_pid_button": "core_linked_records_app"
+                in settings.INSTALLED_APPS,
             }
         )
 
@@ -161,7 +164,7 @@ class DashboardWorkspaceTabs(CommonView):
 
         assets = self._get_assets()
 
-        if "core_file_preview_app" in INSTALLED_APPS:
+        if "core_file_preview_app" in settings.INSTALLED_APPS:
             assets["js"].extend(
                 [
                     {
@@ -174,6 +177,27 @@ class DashboardWorkspaceTabs(CommonView):
                 "core_file_preview_app/user/css/file_preview.css"
             )
             modals.append("core_file_preview_app/user/file_preview_modal.html")
+
+        if context["share_pid_button"]:
+            modals.append(
+                "core_linked_records_app/user/sharing/data_detail/modal.html"
+            )
+            assets["css"].append("core_main_app/common/css/share_link.css"),
+
+            assets["js"] += [
+                {
+                    "path": "core_main_app/user/js/sharing_modal.js",
+                    "is_raw": False,
+                },
+                {
+                    "path": "core_linked_records_app/user/js/sharing/common_list.js",
+                    "is_raw": False,
+                },
+                {
+                    "path": "core_linked_records_app/user/js/sharing/data_list.js",
+                    "is_raw": False,
+                },
+            ]
 
         # Set page title
         context.update({"page_title": "Dashboard"})
@@ -202,6 +226,10 @@ class DashboardWorkspaceTabs(CommonView):
             document_context = {
                 "can_read": user_can_read or is_owner,
                 "can_write": user_can_write or is_owner,
+                "can_change_workspace": check_if_workspace_can_be_changed(
+                    document
+                ),
+                "is_owner": is_owner,
             }
             if tab_selected == "data":
                 forms_count = (
@@ -216,12 +244,8 @@ class DashboardWorkspaceTabs(CommonView):
                 document_context.update(
                     {
                         "data": document,
-                        "is_owner": is_owner,
                         "form_id": self._get_form(document, user),
                         "forms_count": forms_count,
-                        "can_change_workspace": check_if_workspace_can_be_changed(
-                            document
-                        ),
                     }
                 )
             elif tab_selected == "file":
@@ -240,7 +264,6 @@ class DashboardWorkspaceTabs(CommonView):
                         ),
                         "user": username,
                         "date": document.creation_date,
-                        "is_owner": is_owner,
                     }
                 )
             detailed_documents.append(document_context)

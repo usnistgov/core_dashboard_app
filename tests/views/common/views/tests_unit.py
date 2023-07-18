@@ -3,6 +3,8 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from django.test import override_settings
+
 from core_dashboard_app.views.common import views as common_views
 from core_main_app.commons import exceptions
 from core_main_app.utils.tests_tools.MockUser import create_mock_user
@@ -123,3 +125,48 @@ class TestDashboardWorkspaceTabsGet(TestCase):
 
         self.assertIn("owner", response.keys())
         self.assertIn("owner_change_url", response.keys())
+
+    @patch.object(workspace_api, "get_by_id")
+    @patch.object(data_api, "get_all_by_workspace")
+    @patch.object(blob_api, "get_all_by_workspace")
+    @patch.object(workspace_api, "can_user_read_workspace")
+    @patch.object(workspace_api, "can_user_write_workspace")
+    @patch.object(common_views, "ResultsPaginator")
+    @patch.object(common_views, "UserForm")
+    @patch.object(user_api, "get_id_username_dict")
+    @patch.object(user_api, "get_all_users")
+    @patch.object(user_api, "get_user_by_id")
+    @patch.object(common_views.DashboardWorkspaceTabs, "common_render")
+    @override_settings(
+        INSTALLED_APPS=[
+            "core_main_app",
+            "core_dashboard_common_app",
+            "core_linked_records_app",
+        ]
+    )
+    def test_user_side_context_has_share_pid_btn(
+        self,
+        mock_common_render,
+        mock_get_user_by_id,
+        mock_get_all_users,
+        mock_get_id_username_dict,
+        mock_user_form,
+        mock_results_paginator,
+        mock_can_user_write_workspace,
+        mock_can_user_read_workspace,
+        mock_get_all_blob_by_workspace,
+        mock_get_all_data_by_workspace,
+        mock_workspace_get_by_id,
+    ):
+        """test_user_side_context_has_share_pid_btn"""
+        mock_common_render.side_effect = self.mock_render_only_context
+
+        self.workspace_records_view.administration = False
+        response = RequestMock.do_request_get(
+            self.workspace_records_view.as_view(),
+            self.user,
+            param={"workspace_id": 42},
+        )
+
+        self.assertIn("share_pid_button", response.keys())
+        self.assertEquals(response["share_pid_button"], True)
