@@ -8,7 +8,7 @@ from core_main_app.components.workspace.api import (
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
-
+from core_dashboard_common_app import settings as dashboard_settings
 from core_dashboard_common_app import constants as dashboard_constants
 from core_dashboard_common_app.views.common.forms import UserForm
 from core_main_app.access_control.exceptions import AccessControlError
@@ -106,7 +106,7 @@ class DashboardWorkspaceTabs(CommonView):
         results_paginator = ResultsPaginator.get_results(
             items_to_render,
             page,
-            settings.RECORD_PER_PAGE_PAGINATION,
+            dashboard_settings.RECORD_PER_PAGE_PAGINATION,
         )
 
         # Data context
