@@ -11,7 +11,7 @@
 {% block box_body %}
     {% if data.menu and not data.title %}
         <div class="dropdown" id="id_actions" style="display:none">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu1" {% if BOOTSTRAP_VERSION == "4.6.2" %}data-toggle{% elif BOOTSTRAP_VERSION == "5.1.3" %}data-bs-toggle{% endif %}="dropdown" aria-haspopup="true" aria-expanded="true">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu1" {% if BOOTSTRAP_VERSION|first == "4" %}data-toggle{% elif BOOTSTRAP_VERSION|first == "5"  %}data-bs-toggle{% endif %}="dropdown" aria-haspopup="true" aria-expanded="true">
                 Choose action
                 <span class="caret"></span>
             </button>

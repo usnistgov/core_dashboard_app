@@ -1,6 +1,6 @@
 <h1>{{data.title}}</h1>
 
-<a href="{% url 'core_dashboard_workspaces' %}" class="btn btn-secondary back-to-previous {% if BOOTSTRAP_VERSION == "4.6.2" %}float-right{% elif BOOTSTRAP_VERSION == "5.1.3"%}float-end{% endif %}">
+<a href="{% url 'core_dashboard_workspaces' %}" class="btn btn-secondary back-to-previous {% if BOOTSTRAP_VERSION|first == "4" %}float-right{% elif BOOTSTRAP_VERSION|first == "5" %}float-end{% endif %}">
      <i class="fas fa-arrow-left"></i> Previous page
 </a>
 
