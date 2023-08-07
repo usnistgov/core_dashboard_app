@@ -228,7 +228,8 @@ class DashboardWorkspaceTabs(CommonView):
                 "can_write": user_can_write or is_owner,
                 "can_change_workspace": check_if_workspace_can_be_changed(
                     document
-                ),
+                )
+                and user_can_write,
                 "is_owner": is_owner,
             }
             if tab_selected == "data":
