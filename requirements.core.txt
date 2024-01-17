@@ -1,3 +1,3 @@
-core-main-app==2.7.*
-core-explore-common-app==2.7.*
-core-dashboard-common-app==2.7.*
+core-main-app==2.8.*
+core-explore-common-app==2.8.*
+core-dashboard-common-app==2.8.*
