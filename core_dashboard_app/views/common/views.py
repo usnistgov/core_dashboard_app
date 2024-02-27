@@ -346,6 +346,12 @@ class DashboardWorkspaceTabs(CommonView):
                     "is_raw": True,
                 }
             )
+            assets["js"].append(
+                {
+                    "path": dashboard_constants.ADMIN_VIEW_RECORD_RAW,
+                    "is_raw": True,
+                }
+            )
         else:
             assets["js"].append(
                 {
