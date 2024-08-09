@@ -169,4 +169,4 @@ class TestDashboardWorkspaceTabsGet(TestCase):
         )
 
         self.assertIn("share_pid_button", response.keys())
-        self.assertEquals(response["share_pid_button"], True)
+        self.assertEqual(response["share_pid_button"], True)
