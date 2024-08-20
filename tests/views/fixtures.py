@@ -1,5 +1,6 @@
 """ Fixtures files for Data Structure
 """
+
 from core_main_app.components.workspace.models import Workspace
 
 from core_main_app.components.data.models import Data

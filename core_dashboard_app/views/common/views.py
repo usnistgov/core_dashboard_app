@@ -1,5 +1,6 @@
 """ User Views
 """
+
 import copy
 
 from core_main_app.components.workspace.api import (
