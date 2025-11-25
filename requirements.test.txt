@@ -1,4 +1,4 @@
-core-file-preview-app==2.18.*
-core-linked-records-app==2.18.*
-core-curate-app==2.18.*
-core-explore-common-app==2.18.*
+core-file-preview-app==2.19.*
+core-linked-records-app==2.19.*
+core-curate-app==2.19.*
+core-explore-common-app==2.19.*
