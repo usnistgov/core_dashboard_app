@@ -85,14 +85,16 @@ class DashboardWorkspaceTabs(CommonView):
                 items_to_render = data
                 context.update(
                     {
-                        "document": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD.value
+                        "document_type": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD.name,
+                        "document_name": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.RECORD.value,
                     }
                 )
             elif tab_selected == "file":
                 items_to_render = files
                 context.update(
                     {
-                        "document": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE.value
+                        "document_type": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE.name,
+                        "document_name": dashboard_constants.FUNCTIONAL_OBJECT_ENUM.FILE.value,
                     }
                 )
         except AccessControlError:
