@@ -1,5 +1,4 @@
-""" Fixtures files for Data Structure
-"""
+"""Fixtures files for Data Structure"""
 
 from core_main_app.components.workspace.models import Workspace
 

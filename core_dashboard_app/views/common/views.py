@@ -1,5 +1,4 @@
-""" User Views
-"""
+"""User Views"""
 
 import copy
 

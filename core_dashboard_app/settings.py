@@ -1,4 +1,4 @@
-""" Django settings for core_dashboard_app app.
+"""Django settings for core_dashboard_app app.
 
 Settings with the following syntax can be overwritten at the project level:
 SETTING_NAME = getattr(settings, "SETTING_NAME", "Default Value")

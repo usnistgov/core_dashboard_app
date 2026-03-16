@@ -1,5 +1,4 @@
-""" Test access to views
-"""
+"""Test access to views"""
 
 from django.test import RequestFactory
 from core_main_app.utils.integration_tests.integration_base_test_case import (

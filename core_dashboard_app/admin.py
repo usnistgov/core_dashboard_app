@@ -1,5 +1,4 @@
-""" Url router for the administration site
-"""
+"""Url router for the administration site"""
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import re_path
