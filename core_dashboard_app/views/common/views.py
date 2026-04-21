@@ -331,6 +331,10 @@ class DashboardWorkspaceTabs(CommonView):
                     "is_raw": False,
                 },
                 {
+                    "path": "core_dashboard_common_app/common/js/list/delete_data_draft_utils.js",
+                    "is_raw": False,
+                },
+                {
                     "path": "core_dashboard_common_app/common/js/list/delete_data_draft.js",
                     "is_raw": False,
                 },
